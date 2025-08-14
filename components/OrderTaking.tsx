@@ -97,7 +97,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
   const loadMenu = async () => {
     try {
       setMenuLoading(true);
-      const response = await menuApi.getItems();
+      const response = await menuApi.getMenu();
       if (response.items && response.items.length > 0) {
         setMenuData(response.items);
       }
@@ -113,7 +113,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
   // Get next queue number from backend
   const getNextQueueNumber = async () => {
     try {
-      const response = await queueApi.getNextNumber();
+      const response = await queueApi.getNextQueueNumber();
       setQueueNumber(response.queueNumber);
     } catch (err) {
       console.error('Error getting next queue number:', err);

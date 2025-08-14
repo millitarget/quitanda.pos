@@ -26,7 +26,7 @@ export function useOrders(autoRefresh = false, refreshInterval = 5000): UseOrder
   const refreshOrders = useCallback(async () => {
     try {
       setError(null);
-      const fetchedOrdersResponse = await ordersApi.getAll();
+      const fetchedOrdersResponse = await ordersApi.getOrders();
       setOrders(fetchedOrdersResponse.orders);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch orders';
@@ -45,7 +45,7 @@ export function useOrders(autoRefresh = false, refreshInterval = 5000): UseOrder
   }) => {
     try {
       setError(null);
-      const createdResponse = await ordersApi.create(orderData);
+      const createdResponse = await ordersApi.createOrder(orderData);
       const newOrder = createdResponse.order;
       
       // Optimistically update local state
@@ -63,7 +63,7 @@ export function useOrders(autoRefresh = false, refreshInterval = 5000): UseOrder
   const updateOrderStatus = useCallback(async (orderId: string, status: Order['status']) => {
     try {
       setError(null);
-      const updatedResponse = await ordersApi.updateStatus(orderId, status);
+      const updatedResponse = await ordersApi.updateOrderStatus(orderId, status);
       const updatedOrder = updatedResponse.order;
       
       // Optimistically update local state
@@ -83,7 +83,7 @@ export function useOrders(autoRefresh = false, refreshInterval = 5000): UseOrder
   const removeOrder = useCallback(async (orderId: string) => {
     try {
       setError(null);
-      await ordersApi.delete(orderId);
+      await ordersApi.deleteOrder(orderId);
       
       // Optimistically update local state
       setOrders(prev => prev.filter(order => order.id !== orderId));
