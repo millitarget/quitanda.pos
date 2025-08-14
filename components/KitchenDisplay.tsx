@@ -2,8 +2,10 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
+import { Checkbox } from './ui/checkbox';
 import { Order } from '../App';
 import { Clock, ChefHat, CheckCircle, X, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
 
 interface KitchenDisplayProps {
   orders: Order[];
@@ -20,6 +22,21 @@ export function KitchenDisplay({
   loading = false,
   onRefresh 
 }: KitchenDisplayProps) {
+  // State to track checked items for employee organization
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+  const handleItemCheck = (orderId: string, itemId: string, checked: boolean) => {
+    const key = `${orderId}-${itemId}`;
+    setCheckedItems(prev => ({
+      ...prev,
+      [key]: checked
+    }));
+  };
+
+  const isItemChecked = (orderId: string, itemId: string) => {
+    const key = `${orderId}-${itemId}`;
+    return checkedItems[key] || false;
+  };
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500';
@@ -166,12 +183,30 @@ export function KitchenDisplay({
                   <div className="space-y-2 mb-4">
                     {order.items.map((item, index) => (
                       <div key={`${item.id}-${index}`} className="text-sm">
-                        <div className="font-medium">{item.name}</div>
-                        {formatCustomizations(item.customizations) && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {formatCustomizations(item.customizations)}
+                        <div className="flex items-start gap-2">
+                          <Checkbox
+                            id={`${order.id}-${item.id}`}
+                            checked={isItemChecked(order.id, item.id)}
+                            onCheckedChange={(checked) => 
+                              handleItemCheck(order.id, item.id, checked as boolean)
+                            }
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1">
+                            <div className={`font-medium ${
+                              isItemChecked(order.id, item.id) ? 'line-through text-muted-foreground' : ''
+                            }`}>
+                              {item.name}
+                            </div>
+                            {formatCustomizations(item.customizations) && (
+                              <div className={`text-xs text-muted-foreground mt-1 ${
+                                isItemChecked(order.id, item.id) ? 'line-through' : ''
+                              }`}>
+                                {formatCustomizations(item.customizations)}
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ))}
                   </div>
