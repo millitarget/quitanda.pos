@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { OrderTaking } from './components/OrderTaking';
 import { KitchenDisplay } from './components/KitchenDisplay';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from './components/ui/alert';
 import { ChefHat, Smartphone, Wifi, WifiOff } from 'lucide-react';
 import { ordersApi, healthApi } from './utils/api';
 import { toast, Toaster } from 'sonner';
+import { useDeviceOptimization } from './hooks/useDeviceOptimization';
 
 export interface OrderItem {
   id: string;
@@ -37,6 +38,19 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isOnline, setIsOnline] = useState(true);
+  
+  // Device optimization
+  const { 
+    isDynamicIsland, 
+    isNotch, 
+    isPunchHole, 
+    isHomeIndicator,
+    getDeviceSpacing 
+  } = useDeviceOptimization();
+  
+  // Refs for device optimization
+  const headerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Load orders from backend
   const loadOrders = async () => {
@@ -149,7 +163,15 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       {/* Responsive Header */}
-      <div className="bg-card border-b px-3 py-2 sticky top-0 z-50 mobile-safe-area">
+      <div 
+        ref={headerRef}
+        className={`bg-card border-b px-3 py-2 sticky top-0 z-50 ${
+          isDynamicIsland ? 'dynamic-island-header' :
+          isNotch ? 'notch-header' :
+          isPunchHole ? 'punch-hole-header' :
+          'mobile-safe-area'
+        }`}
+      >
         <div className="flex items-center justify-between mobile-nav">
           <div className="flex gap-2 flex-1">
             <Button
@@ -226,7 +248,16 @@ function App() {
       )}
 
       {/* Main Content */}
-      <div className="main-content mobile-safe-area">
+      <div 
+        ref={contentRef}
+        className={`main-content ${
+          isDynamicIsland ? 'dynamic-island-safe' :
+          isNotch ? 'notch-safe' :
+          isPunchHole ? 'punch-hole-header' :
+          isHomeIndicator ? 'home-indicator-safe' :
+          'mobile-safe-area'
+        }`}
+      >
         {currentView === 'orders' ? (
           <OrderTaking 
             onAddOrder={addOrder}

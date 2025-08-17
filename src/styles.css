@@ -1,5 +1,6 @@
 @import '../styles/globals.css';
 @import './mobile-optimization.css';
+@import './device-specific-optimization.css';
 
 @tailwind base;
 @tailwind components;

@@ -1,0 +1,370 @@
+/* Device-Specific Optimization for Different Phone Characteristics */
+
+/* iPhone Dynamic Island and Notch Handling */
+@supports (padding: max(0px)) {
+  /* Dynamic Island (iPhone 14 Pro, 15 Pro) */
+  .dynamic-island-safe {
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  
+  /* Notch devices (iPhone X, XS, 11 Pro, 12 Pro, 13 Pro) */
+  .notch-safe {
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  
+  /* Home indicator safe area */
+  .home-indicator-safe {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  /* Full safe area coverage */
+  .fully-safe {
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* iPhone-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  /* iOS devices */
+  .ios-optimized {
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* iPhone SE (small screen) */
+  @media screen and (max-width: 375px) and (max-height: 667px) {
+    .iphone-se-optimized {
+      --mobile-padding: 12px;
+      --mobile-margin: 12px;
+      --mobile-gap: 8px;
+    }
+    
+    .iphone-se-optimized .mobile-btn {
+      min-height: 52px;
+      min-width: 52px;
+      padding: 14px 18px;
+      font-size: 16px;
+    }
+  }
+  
+  /* iPhone 12/13/14 (medium screen) */
+  @media screen and (min-width: 375px) and (max-width: 390px) and (max-height: 844px) {
+    .iphone-medium-optimized {
+      --mobile-padding: 16px;
+      --mobile-margin: 16px;
+      --mobile-gap: 12px;
+    }
+  }
+  
+  /* iPhone 12/13/14 Pro Max (large screen) */
+  @media screen and (min-width: 428px) and (max-height: 926px) {
+    .iphone-large-optimized {
+      --mobile-padding: 20px;
+      --mobile-margin: 20px;
+      --mobile-gap: 16px;
+    }
+  }
+  
+  /* iPhone 14/15 Pro (Dynamic Island) */
+  @media screen and (min-width: 393px) and (max-width: 430px) {
+    .dynamic-island-optimized {
+      --mobile-padding: 18px;
+      --mobile-margin: 18px;
+      --mobile-gap: 14px;
+    }
+    
+    .dynamic-island-optimized .header-content {
+      padding-top: max(24px, env(safe-area-inset-top));
+      margin-top: max(8px, env(safe-area-inset-top));
+    }
+    
+    .dynamic-island-optimized .sticky-header {
+      top: max(8px, env(safe-area-inset-top));
+    }
+  }
+}
+
+/* Android-specific optimizations */
+@supports not (-webkit-touch-callout: none) {
+  /* Android devices */
+  .android-optimized {
+    -webkit-overflow-scrolling: auto;
+  }
+  
+  /* Samsung Galaxy S series */
+  @media screen and (min-width: 360px) and (max-width: 412px) {
+    .samsung-s-optimized {
+      --mobile-padding: 16px;
+      --mobile-margin: 16px;
+      --mobile-gap: 12px;
+    }
+  }
+  
+  /* Samsung Galaxy Note/Ultra series */
+  @media screen and (min-width: 412px) and (max-width: 450px) {
+    .samsung-note-optimized {
+      --mobile-padding: 18px;
+      --mobile-margin: 18px;
+      --mobile-gap: 14px;
+    }
+  }
+  
+  /* Google Pixel series */
+  @media screen and (min-width: 411px) and (max-width: 435px) {
+    .pixel-optimized {
+      --mobile-padding: 16px;
+      --mobile-margin: 16px;
+      --mobile-gap: 12px;
+    }
+  }
+}
+
+/* Ultra-wide screens (foldables, tablets in phone mode) */
+@media screen and (min-width: 600px) and (max-height: 800px) {
+  .ultra-wide-optimized {
+    --mobile-padding: 24px;
+    --mobile-margin: 24px;
+    --mobile-gap: 20px;
+  }
+  
+  .ultra-wide-optimized .mobile-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Landscape orientation optimizations */
+@media screen and (orientation: landscape) {
+  /* Landscape on phones */
+  @media screen and (max-height: 500px) {
+    .landscape-phone-optimized {
+      --mobile-padding: 8px;
+      --mobile-margin: 8px;
+      --mobile-gap: 6px;
+    }
+    
+    .landscape-phone-optimized .header-content {
+      padding: 8px 16px;
+    }
+    
+    .landscape-phone-optimized .mobile-btn {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+  
+  /* Landscape on tablets */
+  @media screen and (min-height: 500px) and (max-height: 800px) {
+    .landscape-tablet-optimized {
+      --mobile-padding: 16px;
+      --mobile-margin: 16px;
+      --mobile-gap: 12px;
+    }
+  }
+}
+
+/* High DPI and OLED displays */
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {
+  .ultra-hd-optimized {
+    --mobile-padding: 20px;
+    --mobile-margin: 20px;
+    --mobile-gap: 16px;
+  }
+  
+  .ultra-hd-optimized .mobile-btn {
+    min-height: 56px;
+    min-width: 56px;
+    padding: 18px 22px;
+    font-size: 18px;
+  }
+}
+
+/* Foldable device optimizations */
+@media screen and (min-width: 600px) and (max-width: 800px) {
+  .foldable-optimized {
+    --mobile-padding: 20px;
+    --mobile-margin: 20px;
+    --mobile-gap: 16px;
+  }
+  
+  .foldable-optimized .mobile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Device-specific header positioning */
+.device-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+/* Dynamic Island safe header */
+.dynamic-island-header {
+  padding-top: max(24px, env(safe-area-inset-top));
+  margin-top: max(8px, env(safe-area-inset-top));
+}
+
+/* Notch safe header */
+.notch-header {
+  padding-top: max(20px, env(safe-area-inset-top));
+  margin-top: max(8px, env(safe-area-inset-top));
+}
+
+/* Punch-hole camera safe header */
+.punch-hole-header {
+  padding-top: max(18px, env(safe-area-inset-top));
+  margin-top: max(6px, env(safe-area-inset-top));
+}
+
+/* Content area safe positioning */
+.device-content {
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+/* Floating elements safe positioning */
+.floating-element {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 100;
+}
+
+/* Modal safe positioning */
+.device-modal {
+  padding-top: max(20px, env(safe-area-inset-top));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+/* Button positioning for different devices */
+.device-button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure buttons don't go behind Dynamic Island */
+.dynamic-island-button {
+  margin-top: max(8px, env(safe-area-inset-top));
+}
+
+/* Navigation safe positioning */
+.device-nav {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* Bottom sheet safe positioning */
+.bottom-sheet {
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+/* Status bar height compensation */
+.status-bar-compensated {
+  padding-top: max(20px, env(safe-area-inset-top));
+}
+
+/* Home indicator compensation */
+.home-indicator-compensated {
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+/* Device-specific grid adjustments */
+@media screen and (max-width: 375px) {
+  .small-screen-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media screen and (min-width: 376px) and (max-width: 414px) {
+  .medium-screen-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media screen and (min-width: 415px) and (max-width: 480px) {
+  .large-phone-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+/* Device-specific typography scaling */
+@media screen and (max-width: 375px) {
+  .small-screen-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .small-screen-heading {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+}
+
+@media screen and (min-width: 376px) and (max-width: 414px) {
+  .medium-screen-text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .medium-screen-heading {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+}
+
+@media screen and (min-width: 415px) {
+  .large-screen-text {
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  
+  .large-screen-heading {
+    font-size: 22px;
+    line-height: 1.5;
+  }
+}
+
+/* Device-specific spacing */
+@media screen and (max-width: 375px) {
+  .small-screen-spacing {
+    --mobile-padding: 12px;
+    --mobile-margin: 12px;
+    --mobile-gap: 8px;
+  }
+}
+
+@media screen and (min-width: 376px) and (max-width: 414px) {
+  .medium-screen-spacing {
+    --mobile-padding: 16px;
+    --mobile-margin: 16px;
+    --mobile-gap: 12px;
+  }
+}
+
+@media screen and (min-width: 415px) {
+  .large-screen-spacing {
+    --mobile-padding: 20px;
+    --mobile-margin: 20px;
+    --mobile-gap: 16px;
+  }
+}
