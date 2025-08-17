@@ -63,7 +63,7 @@
         });
       }
       
-      // Prevent zoom on double tap (iOS)
+      // Prevent zoom on double tap (iOS) - but allow scrolling
       let lastTouchEnd = 0;
       document.addEventListener('touchend', function (event) {
         const now = (new Date()).getTime();
@@ -73,11 +73,14 @@
         lastTouchEnd = now;
       }, false);
       
-      // Prevent pull-to-refresh on mobile
-      document.body.addEventListener('touchmove', function(e) {
-        if (e.target.closest('.scrollable')) return;
-        e.preventDefault();
-      }, { passive: false });
+      // Enable smooth scrolling for PWA
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add scrollable class to main content areas
+        const scrollableElements = document.querySelectorAll('.main-content, .scrollable');
+        scrollableElements.forEach(el => {
+          el.classList.add('scrollable-content');
+        });
+      });
     </script>
   </body>
 </html>
