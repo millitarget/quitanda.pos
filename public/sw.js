@@ -1,4 +1,4 @@
-const CACHE_NAME = 'restaurant-orders-v1';
+const CACHE_NAME = 'restaurant-orders-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -18,15 +18,33 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Fetch event - serve from cache when offline
+// Fetch strategy: network-first for HTML/CSS/JS to avoid stale UI
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-  );
+  const { request } = event;
+  const isNavigation = request.mode === 'navigate';
+  const isStaticAsset = request.destination === 'script' || request.destination === 'style' || request.destination === 'document';
+
+  if (isNavigation || isStaticAsset) {
+    event.respondWith(
+      (async () => {
+        try {
+          const networkResponse = await fetch(request);
+          // Update cache with fresh response
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        } catch (err) {
+          const cached = await caches.match(request);
+          return cached || caches.match('/');
+        }
+      })()
+    );
+  } else {
+    // For other requests, try cache first then network
+    event.respondWith(
+      caches.match(request).then((cached) => cached || fetch(request))
+    );
+  }
 });
 
 // Activate event - clean up old caches
@@ -43,4 +61,11 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  // Take control immediately
+  self.clients.claim();
+});
+
+// Force waiting SW to activate immediately
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
 });
