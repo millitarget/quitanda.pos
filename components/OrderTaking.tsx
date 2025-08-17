@@ -251,7 +251,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
       </div>
 
       {/* Category Navigation */}
-      <div className="border-b bg-card sticky top-[44px] z-30">
+      <div className="border-b bg-card sticky-below-header">
         <ScrollArea className="w-full">
           <div className="flex gap-2 px-3 py-2 min-w-max">
             {categories.map((category) => (
@@ -270,7 +270,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
       </div>
 
       {/* Sticky Search Bar */}
-      <div className="bg-card border-b px-3 py-2 sticky top-[84px] z-30">
+      <div className="bg-card border-b px-3 py-2 sticky-below-header-2">
         <Input
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}

@@ -6,6 +6,7 @@
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-left: env(safe-area-inset-left, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
+  --app-header-height: 52px;
   
   /* Mobile-first spacing */
   --mobile-padding: 16px;
@@ -22,6 +23,11 @@
   --desktop-margin: 32px;
   --desktop-gap: 28px;
 }
+
+/* Sticky helpers (work across all devices) */
+.sticky-below-header { position: sticky; top: var(--app-header-height); z-index: 30; }
+.sticky-below-header-2 { position: sticky; top: calc(var(--app-header-height) + 40px); z-index: 30; }
+.sticky-below-header-3 { position: sticky; top: calc(var(--app-header-height) + 80px); z-index: 30; }
 
 /* Prevent text selection and context menus */
 * {

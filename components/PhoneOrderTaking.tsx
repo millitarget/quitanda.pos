@@ -186,7 +186,7 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
       </div>
 
       {/* Customer Info Bar */}
-      <div className="bg-card border-b px-3 py-2 sticky top-[44px] z-30 grid grid-cols-2 gap-2">
+      <div className="bg-card border-b px-3 py-2 sticky-below-header grid grid-cols-2 gap-2">
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-muted-foreground" />
           <Input
@@ -214,7 +214,7 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
       </div>
 
       {/* Category Navigation */}
-      <div className="border-b bg-card sticky top-[84px] z-30">
+      <div className="border-b bg-card sticky-below-header-2">
         <ScrollArea className="w-full">
           <div className="flex gap-2 px-3 py-2 min-w-max">
             {categories.map((category) => (
@@ -233,7 +233,7 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
       </div>
 
       {/* Search */}
-      <div className="bg-card border-b px-3 py-2 sticky top-[124px] z-30">
+      <div className="bg-card border-b px-3 py-2 sticky-below-header-3">
         <Input
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
