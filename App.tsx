@@ -174,12 +174,12 @@ function App() {
         }`}
       >
         <div className="flex items-center justify-between mobile-nav">
-          <div className="flex gap-2 flex-1">
+          <div className="grid grid-cols-3 gap-2 w-full">
             <Button
               variant={currentView === 'orders' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setCurrentView('orders')}
-              className="flex-1 mobile-btn touch-target"
+              className="w-full h-10 text-sm touch-target"
             >
               <Smartphone className="h-4 w-4 mr-2" />
               <span className="mobile-text-base tablet-text-lg font-medium">Pedidos</span>
@@ -188,7 +188,7 @@ function App() {
               variant={currentView === 'phone' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setCurrentView('phone')}
-              className="flex-1 mobile-btn touch-target"
+              className="w-full h-10 text-sm touch-target"
             >
               <PhoneCall className="h-4 w-4 mr-2" />
               <span className="mobile-text-base tablet-text-lg font-medium">Telefone</span>
@@ -197,7 +197,7 @@ function App() {
               variant={currentView === 'kitchen' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setCurrentView('kitchen')}
-              className="flex-1 mobile-btn touch-target relative"
+              className="w-full h-10 text-sm touch-target relative"
             >
               <ChefHat className="h-4 w-4 mr-2" />
               <span className="mobile-text-base tablet-text-lg font-medium">Cozinha</span>
