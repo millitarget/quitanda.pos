@@ -99,11 +99,11 @@ export function KitchenDisplay({
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header with refresh */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-card">
+      <div className="flex items-center justify-between px-4 py-3 border-b bg-card sticky top-0 z-50 mobile-safe-area">
         <div className="flex items-center gap-2">
           <ChefHat className="h-5 w-5" />
-          <h2 className="text-lg font-semibold">Kitchen Display</h2>
-          <Badge variant="secondary" className="text-xs">
+          <h2 className="text-base font-semibold">Kitchen Display</h2>
+          <Badge variant="secondary" className="text-xs py-0.5 px-2 rounded-md">
             {orders.length} orders
           </Badge>
         </div>
@@ -114,7 +114,7 @@ export function KitchenDisplay({
             size="sm"
             onClick={onRefresh}
             disabled={loading}
-            className="gap-2"
+            className="gap-2 h-10 rounded-md"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -136,16 +136,16 @@ export function KitchenDisplay({
         </div>
       ) : (
         <ScrollArea className="flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 p-3 md:p-4">
             {sortedOrders.map((order) => {
               const groupedOrder = groupOrderItems(order.items);
               
               return (
                 <Card 
                   key={order.id} 
-                  className={`relative transition-all duration-200 ${
-                    order.status === 'pending' ? 'ring-2 ring-yellow-400' : 
-                    order.status === 'ready' ? 'ring-2 ring-green-400' : ''
+                  className={`relative transition-all duration-200 rounded-lg shadow-xs border border-border/60 ${
+                    order.status === 'pending' ? 'ring-1 ring-yellow-400/50' : 
+                    order.status === 'ready' ? 'ring-1 ring-green-400/50' : ''
                   }`}
                 >
                   <CardContent className="p-4">
@@ -167,9 +167,9 @@ export function KitchenDisplay({
                         variant="ghost"
                         size="sm"
                         onClick={() => onRemoveOrder(order.id)}
-                        className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive rounded-md"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
 
@@ -199,7 +199,7 @@ export function KitchenDisplay({
                                 {groupedItem.quantity > 1 && (
                                   <Badge 
                                     variant="default" 
-                                    className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0"
+                                    className="bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0 rounded"
                                   >
                                     {groupedItem.quantity}x
                                   </Badge>
@@ -219,7 +219,7 @@ export function KitchenDisplay({
                                         {formatCustomizationsForDisplay([breakdown.customizations])[0]}
                                       </div>
                                       {breakdown.quantity > 1 && (
-                                        <Badge variant="outline" className="text-xs px-2 py-0">
+                                        <Badge variant="outline" className="text-[10px] px-2 py-0 rounded">
                                           {breakdown.quantity}x
                                         </Badge>
                                       )}
@@ -243,7 +243,7 @@ export function KitchenDisplay({
 
                     {/* Order Total */}
                     <div className="flex items-center justify-between mb-4">
-                      <Badge variant="default" className="text-xs">
+                      <Badge variant="default" className="text-xs py-0.5 px-2 rounded">
                         {order.items.length} items
                       </Badge>
                       <div className="font-semibold">€{order.total.toFixed(2)}</div>
@@ -255,9 +255,9 @@ export function KitchenDisplay({
                         <Button
                           size="sm"
                           onClick={() => onUpdateStatus(order.id, 'preparing')}
-                          className="flex-1 h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                          className="flex-1 h-10 text-sm rounded-md bg-blue-600 hover:bg-blue-700"
                         >
-                          <ChefHat className="h-3 w-3 mr-1" />
+                          <ChefHat className="h-4 w-4 mr-2" />
                           Start
                         </Button>
                       )}
@@ -266,16 +266,16 @@ export function KitchenDisplay({
                         <Button
                           size="sm"
                           onClick={() => onUpdateStatus(order.id, 'ready')}
-                          className="flex-1 h-8 text-xs bg-green-600 hover:bg-green-700"
+                          className="flex-1 h-10 text-sm rounded-md bg-green-600 hover:bg-green-700"
                         >
-                          <CheckCircle className="h-3 w-3 mr-1" />
+                          <CheckCircle className="h-4 w-4 mr-2" />
                           Ready
                         </Button>
                       )}
                       
                       {order.status === 'ready' && (
-                        <Badge variant="default" className="flex-1 justify-center py-1 bg-green-600">
-                          <CheckCircle className="h-3 w-3 mr-1" />
+                        <Badge variant="default" className="flex-1 justify-center py-2 bg-green-600 rounded-md">
+                          <CheckCircle className="h-4 w-4 mr-2" />
                           Ready for Pickup
                         </Badge>
                       )}

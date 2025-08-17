@@ -5,8 +5,7 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { Alert, AlertDescription } from './components/ui/alert';
-import { ChefHat, Smartphone, Wifi, WifiOff, PhoneCall } from 'lucide-react';
-import { PhoneOrderTaking } from './components/PhoneOrderTaking';
+import { ChefHat, Smartphone, Wifi, WifiOff } from 'lucide-react';
 import { ordersApi, healthApi } from './utils/api';
 import { toast, Toaster } from 'sonner';
 import { useDeviceOptimization } from './hooks/useDeviceOptimization';
@@ -35,7 +34,7 @@ export interface Order {
 
 function App() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [currentView, setCurrentView] = useState<'orders' | 'phone' | 'kitchen'>('orders');
+  const [currentView, setCurrentView] = useState<'orders' | 'kitchen'>('orders');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isOnline, setIsOnline] = useState(true);
@@ -174,30 +173,21 @@ function App() {
         }`}
       >
         <div className="flex items-center justify-between mobile-nav">
-          <div className="grid grid-cols-3 gap-2 w-full">
+          <div className="flex gap-2 flex-1">
             <Button
               variant={currentView === 'orders' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setCurrentView('orders')}
-              className="w-full h-10 text-sm touch-target"
+              className="flex-1 mobile-btn touch-target"
             >
               <Smartphone className="h-4 w-4 mr-2" />
               <span className="mobile-text-base tablet-text-lg font-medium">Pedidos</span>
             </Button>
             <Button
-              variant={currentView === 'phone' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setCurrentView('phone')}
-              className="w-full h-10 text-sm touch-target"
-            >
-              <PhoneCall className="h-4 w-4 mr-2" />
-              <span className="mobile-text-base tablet-text-lg font-medium">Telefone</span>
-            </Button>
-            <Button
               variant={currentView === 'kitchen' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setCurrentView('kitchen')}
-              className="w-full h-10 text-sm touch-target relative"
+              className="flex-1 mobile-btn touch-target relative"
             >
               <ChefHat className="h-4 w-4 mr-2" />
               <span className="mobile-text-base tablet-text-lg font-medium">Cozinha</span>
@@ -268,21 +258,13 @@ function App() {
           'mobile-safe-area'
         }`}
       >
-        {currentView === 'orders' && (
+        {currentView === 'orders' ? (
           <OrderTaking 
             onAddOrder={addOrder}
             existingOrders={orders}
             loading={loading}
           />
-        )}
-        {currentView === 'phone' && (
-          <PhoneOrderTaking 
-            onAddOrder={addOrder}
-            existingOrders={orders}
-            loading={loading}
-          />
-        )}
-        {currentView === 'kitchen' && (
+        ) : (
           <KitchenDisplay 
             orders={orders}
             onUpdateStatus={updateOrderStatus}

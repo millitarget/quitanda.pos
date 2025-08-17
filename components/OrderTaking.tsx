@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { MobileMenuGrid } from './MobileMenuGrid';
 import { FloatingOrderSummary } from './FloatingOrderSummary';
-import { FloatingCartPill } from './FloatingCartPill';
 import { NumberPadModal } from './NumberPadModal';
 import { Order, OrderItem } from '../App';
 import { ShoppingCart, Edit3, RefreshCw } from 'lucide-react';
@@ -86,7 +84,6 @@ const defaultMenuData: MenuItem[] = [
 export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading }: OrderTakingProps) {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('Carne');
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [queueNumber, setQueueNumber] = useState<number>(1);
   const [showNumberPad, setShowNumberPad] = useState(false);
@@ -251,7 +248,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
       </div>
 
       {/* Category Navigation */}
-      <div className="border-b bg-card sticky-below-header">
+      <div className="border-b bg-card sticky top-[44px] z-30">
         <ScrollArea className="w-full">
           <div className="flex gap-2 px-3 py-2 min-w-max">
             {categories.map((category) => (
@@ -269,18 +266,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         </ScrollArea>
       </div>
 
-      {/* Sticky Search Bar */}
-      <div className="bg-card border-b px-3 py-2 sticky-below-header-2">
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Pesquisar itens (ex: frango, salada, vinho)"
-          className="h-10 rounded-md text-sm"
-        />
-      </div>
-
       {/* Menu Items Grid */}
-      {/* Scrollable Items Only */}
       <div className="flex-1 overflow-auto">
         {menuLoading ? (
           <div className="flex items-center justify-center h-32 gap-3">
@@ -290,26 +276,41 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         ) : (
           <MobileMenuGrid
             category={selectedCategory}
-            items={menuData
-              .filter(item => item.category === selectedCategory)
-              .filter(item =>
-                searchTerm.trim().length === 0
-                  ? true
-                  : item.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )}
+            items={menuData.filter(item => item.category === selectedCategory)}
             onAddItem={addItemToOrder}
           />
         )}
       </div>
 
-      {/* Floating Cart Pill (non-intrusive) */}
-      <FloatingCartPill
-        count={currentOrder.length}
-        total={total}
-        onOpenSummary={() => setShowOrderSummary(true)}
-        onSubmit={() => submitOrder()}
-        submitting={submitting}
-      />
+      {/* Action Bar */}
+      {currentOrder.length > 0 && (
+        <div className="border-t bg-card px-3 py-3 sticky bottom-0 z-40">
+          <div className="flex gap-2 items-center">
+            <Button 
+              variant="outline" 
+              onClick={clearOrder}
+              className="flex-1 h-10 text-sm rounded-md"
+              disabled={submitting}
+            >
+              Limpar
+            </Button>
+            <Button 
+              onClick={() => submitOrder()}
+              disabled={isQueueNumberTaken || submitting || parentLoading}
+              className="flex-2 h-10 text-sm rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
+            >
+              {submitting ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                `Enviar (${currentOrder.length})`
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Number Pad Modal */}
       <NumberPadModal
