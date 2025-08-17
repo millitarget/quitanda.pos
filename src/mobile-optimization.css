@@ -6,6 +6,21 @@
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-left: env(safe-area-inset-left, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
+  
+  /* Mobile-first spacing */
+  --mobile-padding: 16px;
+  --mobile-margin: 16px;
+  --mobile-gap: 12px;
+  
+  /* Tablet spacing */
+  --tablet-padding: 24px;
+  --tablet-margin: 24px;
+  --tablet-gap: 20px;
+  
+  /* Desktop spacing */
+  --desktop-padding: 32px;
+  --desktop-margin: 32px;
+  --desktop-gap: 28px;
 }
 
 /* Prevent text selection and context menus */
@@ -34,7 +49,7 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -53,17 +68,28 @@ input, select, textarea {
   font-size: 16px !important;
 }
 
-/* Touch-friendly button sizes */
-button, .btn {
-  min-height: 44px; /* iOS recommended minimum */
-  min-width: 44px;
+/* Mobile-first touch targets */
+button, .btn, .touch-target {
+  min-height: 48px; /* Increased from 44px for better mobile experience */
+  min-width: 48px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+/* Mobile-specific button sizes */
+.mobile-btn {
+  min-height: 56px;
+  min-width: 56px;
+  padding: 16px 20px;
+  font-size: 18px;
 }
 
 /* Touch-friendly spacing */
 .touch-target {
-  min-height: 44px;
-  min-width: 44px;
-  padding: 12px;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 12px 16px;
 }
 
 /* Prevent pull-to-refresh but allow scrolling */
@@ -81,103 +107,114 @@ body {
 }
 
 /* Mobile-first responsive breakpoints */
-/* Extra Small devices (phones, 320px and up) */
-@media (min-width: 320px) {
-  .container {
-    width: 100%;
-    padding: 0 16px;
-    margin: 0 auto;
-  }
-  
-  .mobile-padding {
-    padding: 16px;
-  }
-  
-  .mobile-margin {
-    margin: 16px;
-  }
+/* Base mobile styles (320px and up) */
+.container {
+  width: 100%;
+  padding: 0 var(--mobile-padding);
+  margin: 0 auto;
 }
 
-/* Small devices (phones, 480px and up) */
+.mobile-padding { padding: var(--mobile-padding); }
+.mobile-margin { margin: var(--mobile-margin); }
+.mobile-gap { gap: var(--mobile-gap); }
+
+/* Small phones (480px and up) */
 @media (min-width: 480px) {
   .container {
     padding: 0 20px;
   }
   
-  .mobile-padding {
-    padding: 20px;
-  }
-  
-  .mobile-margin {
-    margin: 20px;
-  }
+  .mobile-padding { padding: 20px; }
+  .mobile-margin { margin: 20px; }
+  .mobile-gap { gap: 16px; }
 }
 
-/* Medium devices (tablets, 768px and up) */
-@media (min-width: 768px) {
+/* Medium phones (640px and up) */
+@media (min-width: 640px) {
   .container {
-    max-width: 768px;
     padding: 0 24px;
   }
   
-  .tablet-padding {
-    padding: 24px;
+  .mobile-padding { padding: 24px; }
+  .mobile-margin { margin: 24px; }
+  .mobile-gap { gap: 20px; }
+}
+
+/* Tablets (768px and up) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+    padding: 0 var(--tablet-padding);
   }
   
-  .tablet-margin {
-    margin: 24px;
-  }
+  .tablet-padding { padding: var(--tablet-padding); }
+  .tablet-margin { margin: var(--tablet-margin); }
+  .tablet-gap { gap: var(--tablet-gap); }
   
-  /* Tablet-specific grid adjustments */
+  /* Tablet grid layouts */
   .tablet-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    gap: var(--tablet-gap);
+  }
+  
+  .tablet-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Large devices (tablets, 1024px and up) */
+/* Large tablets (1024px and up) */
 @media (min-width: 1024px) {
   .container {
     max-width: 1024px;
-    padding: 0 32px;
+    padding: 0 var(--tablet-padding);
   }
   
-  .tablet-padding {
-    padding: 32px;
-  }
-  
-  .tablet-margin {
-    margin: 32px;
-  }
-  
-  /* Large tablet grid */
-  .tablet-grid {
+  .tablet-grid-3 {
     grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+  }
+  
+  .tablet-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Extra large devices (desktop, 1280px and up) */
+/* Desktop (1280px and up) */
 @media (min-width: 1280px) {
   .container {
     max-width: 1280px;
-    padding: 0 40px;
+    padding: 0 var(--desktop-padding);
   }
   
-  .desktop-padding {
-    padding: 40px;
-  }
+  .desktop-padding { padding: var(--desktop-padding); }
+  .desktop-margin { margin: var(--desktop-margin); }
+  .desktop-gap { gap: var(--desktop-gap); }
   
-  .desktop-margin {
-    margin: 40px;
-  }
-  
-  /* Desktop grid */
   .desktop-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
+    gap: var(--desktop-gap);
+  }
+}
+
+/* Mobile-specific grid layouts */
+.mobile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--mobile-gap);
+}
+
+@media (min-width: 480px) {
+  .mobile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 640px) {
+  .mobile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 }
 
@@ -224,11 +261,6 @@ body {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* PWA-specific styles */
-.pwa-installed {
-  /* Styles when running as installed PWA */
-}
-
 /* Safe area for notched devices */
 .safe-area {
   padding-top: max(16px, var(--safe-area-top));
@@ -265,24 +297,32 @@ body {
   }
 }
 
-/* Responsive typography */
+/* Mobile-first responsive typography */
+.mobile-text-xs { font-size: 12px; }
 .mobile-text-sm { font-size: 14px; }
 .mobile-text-base { font-size: 16px; }
 .mobile-text-lg { font-size: 18px; }
 .mobile-text-xl { font-size: 20px; }
+.mobile-text-2xl { font-size: 24px; }
 
+/* Tablet typography */
 @media (min-width: 768px) {
-  .tablet-text-sm { font-size: 14px; }
-  .tablet-text-base { font-size: 16px; }
-  .tablet-text-lg { font-size: 20px; }
-  .tablet-text-xl { font-size: 24px; }
-}
-
-@media (min-width: 1024px) {
+  .tablet-text-xs { font-size: 14px; }
   .tablet-text-sm { font-size: 16px; }
   .tablet-text-base { font-size: 18px; }
+  .tablet-text-lg { font-size: 20px; }
+  .tablet-text-xl { font-size: 24px; }
+  .tablet-text-2xl { font-size: 28px; }
+}
+
+/* Desktop typography */
+@media (min-width: 1024px) {
+  .tablet-text-xs { font-size: 16px; }
+  .tablet-text-sm { font-size: 18px; }
+  .tablet-text-base { font-size: 20px; }
   .tablet-text-lg { font-size: 22px; }
   .tablet-text-xl { font-size: 26px; }
+  .tablet-text-2xl { font-size: 32px; }
 }
 
 /* Responsive spacing utilities */
@@ -290,12 +330,14 @@ body {
 .mobile-space-2 { margin: 8px; }
 .mobile-space-3 { margin: 12px; }
 .mobile-space-4 { margin: 16px; }
+.mobile-space-5 { margin: 20px; }
 
 @media (min-width: 768px) {
   .tablet-space-1 { margin: 6px; }
   .tablet-space-2 { margin: 12px; }
   .tablet-space-3 { margin: 18px; }
   .tablet-space-4 { margin: 24px; }
+  .tablet-space-5 { margin: 30px; }
 }
 
 @media (min-width: 1024px) {
@@ -303,6 +345,7 @@ body {
   .tablet-space-2 { margin: 16px; }
   .tablet-space-3 { margin: 24px; }
   .tablet-space-4 { margin: 32px; }
+  .tablet-space-5 { margin: 40px; }
 }
 
 /* Ensure content is scrollable */
@@ -310,15 +353,82 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  height: 100%;
-  padding-bottom: env(safe-area-inset-bottom);
+  height: calc(100vh - 60px); /* Account for header height */
+  height: calc(100dvh - 60px); /* Dynamic viewport height */
+  padding-bottom: var(--safe-area-bottom);
 }
 
 /* Fix for PWA full-screen scrolling */
 @media (display-mode: standalone) {
   .main-content {
-    height: 100vh;
-    height: 100dvh;
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
     overflow-y: auto;
+  }
+}
+
+/* Mobile card layouts */
+.mobile-card {
+  padding: var(--mobile-padding);
+  margin: var(--mobile-margin);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .mobile-card {
+    padding: var(--tablet-padding);
+    margin: var(--tablet-margin);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Mobile form elements */
+.mobile-input {
+  height: 48px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.mobile-select {
+  height: 48px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+/* Mobile navigation */
+.mobile-nav {
+  padding: var(--mobile-padding);
+  gap: var(--mobile-gap);
+}
+
+@media (min-width: 768px) {
+  .mobile-nav {
+    padding: var(--tablet-padding);
+    gap: var(--tablet-gap);
+  }
+}
+
+/* Mobile list layouts */
+.mobile-list {
+  gap: var(--mobile-gap);
+}
+
+.mobile-list-item {
+  padding: var(--mobile-padding);
+  margin-bottom: var(--mobile-gap);
+}
+
+@media (min-width: 768px) {
+  .mobile-list {
+    gap: var(--tablet-gap);
+  }
+  
+  .mobile-list-item {
+    padding: var(--tablet-padding);
+    margin-bottom: var(--tablet-gap);
   }
 }
