@@ -5,6 +5,7 @@ import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { MobileMenuGrid } from './MobileMenuGrid';
 import { FloatingOrderSummary } from './FloatingOrderSummary';
+import { FloatingCartPill } from './FloatingCartPill';
 import { NumberPadModal } from './NumberPadModal';
 import { Order, OrderItem } from '../App';
 import { ShoppingCart, Edit3, RefreshCw } from 'lucide-react';
@@ -279,6 +280,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
       </div>
 
       {/* Menu Items Grid */}
+      {/* Scrollable Items Only */}
       <div className="flex-1 overflow-auto">
         {menuLoading ? (
           <div className="flex items-center justify-center h-32 gap-3">
@@ -300,35 +302,14 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         )}
       </div>
 
-      {/* Action Bar */}
-      {currentOrder.length > 0 && (
-        <div className="border-t bg-card px-3 py-3 sticky bottom-0 z-40">
-          <div className="flex gap-2 items-center">
-            <Button 
-              variant="outline" 
-              onClick={clearOrder}
-              className="flex-1 h-10 text-sm rounded-md"
-              disabled={submitting}
-            >
-              Limpar
-            </Button>
-            <Button 
-              onClick={() => submitOrder()}
-              disabled={isQueueNumberTaken || submitting || parentLoading}
-              className="flex-2 h-10 text-sm rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
-            >
-              {submitting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                `Enviar (${currentOrder.length})`
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Floating Cart Pill (non-intrusive) */}
+      <FloatingCartPill
+        count={currentOrder.length}
+        total={total}
+        onOpenSummary={() => setShowOrderSummary(true)}
+        onSubmit={() => submitOrder()}
+        submitting={submitting}
+      />
 
       {/* Number Pad Modal */}
       <NumberPadModal
