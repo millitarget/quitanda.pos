@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
+import { Plus } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { MenuItem } from './OrderTaking';
 
 interface MobileMenuGridProps {
@@ -108,21 +109,21 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
           <Card key={item.id} className="overflow-hidden rounded-lg shadow-xs border border-border/60">
             <CardContent className="p-0">
               {/* Main Item Row */}
-              <div className="flex items-center justify-between p-3">
-                <div className="flex-1 min-w-0 pr-3">
-                  <h3 className="font-medium text-sm leading-tight">{item.name}</h3>
+              <div className="flex items-center justify-between p-3 gap-3">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-base leading-tight">{item.name}</h3>
                   {item.description && (
                     <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
                   )}
                   {hasCustomizations && (
                     <p className="text-xs font-medium text-primary mt-1">{hasCustomizations}</p>
                   )}
-                  <Badge variant="secondary" className="mt-2 text-xs py-0.5 px-2 rounded-md">
+                  <Badge variant="secondary" className="mt-2 text-sm py-0.5 px-2 rounded-md">
                     €{item.price.toFixed(2)}
                   </Badge>
                 </div>
                 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   {needsCustomization && (
                     <Collapsible
                       open={isExpanded}
@@ -146,10 +147,10 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                   <Button
                     onClick={() => handleQuickAdd(item)}
                     size="sm"
-                    className="h-8 px-3 bg-green-600 hover:bg-green-700 text-xs rounded-md"
+                    className="h-10 px-3 bg-green-600 hover:bg-green-700 text-sm rounded-md text-white"
                   >
-                    <Plus className="h-3 w-3 mr-1" />
-                    +
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adicionar
                   </Button>
                 </div>
               </div>

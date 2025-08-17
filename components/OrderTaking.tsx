@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { MobileMenuGrid } from './MobileMenuGrid';
@@ -84,6 +85,7 @@ const defaultMenuData: MenuItem[] = [
 export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading }: OrderTakingProps) {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('Carne');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [queueNumber, setQueueNumber] = useState<number>(1);
   const [showNumberPad, setShowNumberPad] = useState(false);
@@ -266,6 +268,16 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         </ScrollArea>
       </div>
 
+      {/* Sticky Search Bar */}
+      <div className="bg-card border-b px-3 py-2 sticky top-[84px] z-30">
+        <Input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Pesquisar itens (ex: frango, salada, vinho)"
+          className="h-10 rounded-md text-sm"
+        />
+      </div>
+
       {/* Menu Items Grid */}
       <div className="flex-1 overflow-auto">
         {menuLoading ? (
@@ -276,7 +288,13 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         ) : (
           <MobileMenuGrid
             category={selectedCategory}
-            items={menuData.filter(item => item.category === selectedCategory)}
+            items={menuData
+              .filter(item => item.category === selectedCategory)
+              .filter(item =>
+                searchTerm.trim().length === 0
+                  ? true
+                  : item.name.toLowerCase().includes(searchTerm.toLowerCase())
+              )}
             onAddItem={addItemToOrder}
           />
         )}
