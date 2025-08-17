@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { OrderTaking } from './components/OrderTaking';
 import { KitchenDisplay } from './components/KitchenDisplay';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { Alert, AlertDescription } from './components/ui/alert';
@@ -250,6 +251,9 @@ function App() {
         closeButton
         duration={3000}
       />
+      
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 }

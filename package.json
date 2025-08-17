@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --port 4173"
+    "preview": "vite preview --port 4173",
+    "build:pwa": "tsc -b && vite build && echo 'PWA build complete! Make sure to replace placeholder icons with actual restaurant branding.'"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",
