@@ -193,21 +193,21 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
 
   return (
     <div className="flex flex-col h-full bg-background relative">
-      {/* Compact Queue Number + Cart */}
-      <div className="flex items-center justify-between px-3 py-2 bg-card border-b">
+      {/* Header: Queue + Total + Cart */}
+      <div className="flex items-center justify-between px-3 py-2 bg-card border-b sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Nº</span>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowNumberPad(true)}
-            className={`h-7 px-3 text-sm font-mono ${isQueueNumberTaken ? 'border-red-500 text-red-600' : ''}`}
+            className={`h-9 px-3 text-sm font-mono rounded-md ${isQueueNumberTaken ? 'border-red-500 text-red-600' : ''}`}
           >
             {queueNumber}
-            <Edit3 className="h-3 w-3 ml-1" />
+            <Edit3 className="h-4 w-4 ml-2" />
           </Button>
           {isQueueNumberTaken && (
-            <Badge variant="destructive" className="text-xs py-0 px-2">
+            <Badge variant="destructive" className="text-xs py-0 px-2 rounded">
               Usado
             </Badge>
           )}
@@ -218,9 +218,9 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
             size="sm"
             onClick={loadMenu}
             disabled={menuLoading}
-            className="h-7 w-7 p-0"
+            className="h-9 w-9 p-0 rounded-md"
           >
-            <RefreshCw className={`h-3 w-3 ${menuLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${menuLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
         
@@ -230,34 +230,34 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
               variant="outline"
               size="sm"
               onClick={() => setShowOrderSummary(true)}
-              className="relative h-7 w-7 p-0"
+              className="relative h-9 w-9 p-0 rounded-md"
             >
-              <ShoppingCart className="h-3 w-3" />
+              <ShoppingCart className="h-4 w-4" />
               <Badge 
                 variant="destructive" 
-                className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center"
+                className="absolute -top-1 -right-1 h-5 w-5 p-0 text-[10px] flex items-center justify-center rounded-full"
               >
                 {currentOrder.length}
               </Badge>
             </Button>
           )}
-          <Badge variant="secondary" className="text-xs py-1 px-2">
+          <Badge variant="secondary" className="text-sm py-1.5 px-2.5 rounded-md">
             €{total.toFixed(2)}
           </Badge>
         </div>
       </div>
 
-      {/* Compact Category Navigation */}
-      <div className="border-b bg-card">
+      {/* Category Navigation */}
+      <div className="border-b bg-card sticky top-[44px] z-30">
         <ScrollArea className="w-full">
-          <div className="flex gap-1 px-3 py-2 min-w-max">
+          <div className="flex gap-2 px-3 py-2 min-w-max">
             {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory(category)}
-                className="whitespace-nowrap px-3 py-1 h-6 text-xs"
+                className="whitespace-nowrap px-3 py-2 h-9 text-sm rounded-md"
               >
                 {category}
               </Button>
@@ -269,9 +269,9 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
       {/* Menu Items Grid */}
       <div className="flex-1 overflow-auto">
         {menuLoading ? (
-          <div className="flex items-center justify-center h-32">
+          <div className="flex items-center justify-center h-32 gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2 text-sm text-muted-foreground">Loading menu...</span>
+            <span className="text-sm text-muted-foreground">A carregar menu...</span>
           </div>
         ) : (
           <MobileMenuGrid
@@ -282,14 +282,14 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         )}
       </div>
 
-      {/* Compact Action Bar */}
+      {/* Action Bar */}
       {currentOrder.length > 0 && (
-        <div className="border-t bg-card px-3 py-2">
-          <div className="flex gap-2">
+        <div className="border-t bg-card px-3 py-3 sticky bottom-0 z-40">
+          <div className="flex gap-2 items-center">
             <Button 
               variant="outline" 
               onClick={clearOrder}
-              className="flex-1 h-8 text-xs"
+              className="flex-1 h-10 text-sm rounded-md"
               disabled={submitting}
             >
               Limpar
@@ -297,11 +297,11 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
             <Button 
               onClick={() => submitOrder()}
               disabled={isQueueNumberTaken || submitting || parentLoading}
-              className="flex-2 h-8 text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
+              className="flex-2 h-10 text-sm rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
             >
               {submitting ? (
                 <>
-                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   Enviando...
                 </>
               ) : (

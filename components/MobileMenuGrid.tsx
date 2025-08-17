@@ -98,14 +98,14 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
   };
 
   return (
-    <div className="p-2 space-y-2">
+    <div className="p-3 space-y-3">
       {items.map((item) => {
         const needsCustomization = isMeatItem(item.name);
         const isExpanded = expandedItem === item.id;
         const hasCustomizations = getSelectedCustomizations(item);
         
         return (
-          <Card key={item.id} className="overflow-hidden">
+          <Card key={item.id} className="overflow-hidden rounded-lg shadow-xs border border-border/60">
             <CardContent className="p-0">
               {/* Main Item Row */}
               <div className="flex items-center justify-between p-3">
@@ -117,7 +117,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                   {hasCustomizations && (
                     <p className="text-xs font-medium text-primary mt-1">{hasCustomizations}</p>
                   )}
-                  <Badge variant="secondary" className="mt-1 text-xs py-0 px-2">
+                  <Badge variant="secondary" className="mt-2 text-xs py-0.5 px-2 rounded-md">
                     €{item.price.toFixed(2)}
                   </Badge>
                 </div>
@@ -132,7 +132,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 rounded-md"
                         >
                           {isExpanded ? 
                             <ChevronUp className="h-3 w-3" /> : 
@@ -146,7 +146,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                   <Button
                     onClick={() => handleQuickAdd(item)}
                     size="sm"
-                    className="h-8 px-3 bg-green-600 hover:bg-green-700 text-xs"
+                    className="h-8 px-3 bg-green-600 hover:bg-green-700 text-xs rounded-md"
                   >
                     <Plus className="h-3 w-3 mr-1" />
                     +
@@ -165,7 +165,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                       {/* Multi-Sauce Options */}
                       <div>
                         <h4 className="font-medium mb-2 text-xs">Molhos (opcional - múltipla escolha)</h4>
-                        <div className="grid grid-cols-2 gap-1">
+                        <div className="grid grid-cols-2 gap-2">
                           {sauceOptions.map((sauce) => {
                             const isSelected = selectedSauces[item.id]?.includes(sauce.value) || false;
                             return (
@@ -174,8 +174,8 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                                 variant={isSelected ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleSauceToggle(item.id, sauce.value)}
-                                className={`h-7 px-2 text-xs whitespace-normal leading-tight ${
-                                  isSelected ? 'bg-green-600 hover:bg-green-700' : ''
+                                className={`h-8 px-2 text-xs whitespace-normal leading-tight rounded-md ${
+                                  isSelected ? 'bg-green-600 hover:bg-green-700 text-white' : ''
                                 }`}
                               >
                                 {sauce.label}
@@ -194,15 +194,15 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                       {isChickenItem(item.name) && (
                         <div>
                           <h4 className="font-medium mb-2 text-xs">Cozedura (opcional)</h4>
-                          <div className="grid grid-cols-2 gap-1">
+                          <div className="grid grid-cols-2 gap-2">
                             {chickenOptions.map((chicken) => (
                               <Button
                                 key={chicken.value}
                                 variant={selectedChickenTypes[item.id] === chicken.value ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleChickenTypeSelect(item.id, chicken.value)}
-                                className={`h-7 px-2 text-xs ${
-                                  selectedChickenTypes[item.id] === chicken.value ? 'bg-green-600 hover:bg-green-700' : ''
+                                className={`h-8 px-2 text-xs rounded-md ${
+                                  selectedChickenTypes[item.id] === chicken.value ? 'bg-green-600 hover:bg-green-700 text-white' : ''
                                 }`}
                               >
                                 {chicken.label}
@@ -215,7 +215,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                       {/* Quick Add with Settings */}
                       <Button
                         onClick={() => handleQuickAdd(item)}
-                        className="w-full bg-green-600 hover:bg-green-700 h-8 text-xs"
+                        className="w-full bg-green-600 hover:bg-green-700 h-9 text-sm rounded-md text-white"
                       >
                         <Plus className="h-3 w-3 mr-1" />
                         Adicionar
