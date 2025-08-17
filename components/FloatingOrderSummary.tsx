@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
 import { Trash2, X, FileText, RefreshCw } from 'lucide-react';
 import { OrderItem } from '../App';
 import { OrderNotesModal } from './OrderNotesModal';
+import { groupOrderItems, formatCustomizationsForDisplay } from '../utils/orderGrouping';
 
 interface FloatingOrderSummaryProps {
   isOpen: boolean;
@@ -31,33 +32,7 @@ export function FloatingOrderSummary({
   const [orderNotes, setOrderNotes] = useState('');
   const [showNotesModal, setShowNotesModal] = useState(false);
 
-  const formatCustomizations = (customizations: OrderItem['customizations']) => {
-    const parts = [];
-    
-    if (customizations.sauces && customizations.sauces.length > 0) {
-      const sauceLabels: Record<string, string> = {
-        'com-picante': 'Com Picante',
-        'sem-picante': 'Sem Picante',
-        'picante-sem-alho': 'Picante s/Alho',
-        'molho-da-guia': 'Molho Guia',
-        'muito-molho': 'Muito Molho',
-      };
-      const formattedSauces = customizations.sauces.map(sauce => 
-        sauceLabels[sauce] || sauce
-      ).join(', ');
-      parts.push(formattedSauces);
-    }
-    
-    if (customizations.chickenType) {
-      const chickenLabels: Record<string, string> = {
-        'lourinho': 'Lourinho',
-        'bem-passado': 'Bem Passado',
-      };
-      parts.push(chickenLabels[customizations.chickenType] || customizations.chickenType);
-    }
-    
-    return parts.length > 0 ? parts.join(' | ') : null;
-  };
+  const groupedOrder = groupOrderItems(items);
 
   const handleSubmit = () => {
     onSubmitOrder(orderNotes || undefined);
@@ -115,29 +90,58 @@ export function FloatingOrderSummary({
                     </div>
 
                     {/* Order Items */}
-                    {items.map((item) => (
-                      <div key={item.id} className="flex items-start justify-between gap-2 p-2 bg-card rounded border">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm leading-tight">{item.name}</h4>
-                          {formatCustomizations(item.customizations) && (
-                            <div className="mt-1">
-                              <p className="text-xs text-muted-foreground line-clamp-3">
-                                {formatCustomizations(item.customizations)}
-                              </p>
+                    {groupedOrder.items.map((groupedItem, index) => (
+                      <div key={`${groupedItem.name}-${index}`} className="p-2 bg-card rounded border">
+                        {/* Item Header with Total Quantity */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              {groupedItem.quantity > 1 && (
+                                <Badge 
+                                  variant="default" 
+                                  className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0"
+                                >
+                                  {groupedItem.quantity}x
+                                </Badge>
+                              )}
+                              <h4 className="font-medium text-sm leading-tight">{groupedItem.name}</h4>
                             </div>
-                          )}
-                          <Badge variant="secondary" className="mt-1 text-xs py-0 px-2">
-                            €{item.price.toFixed(2)}
-                          </Badge>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs py-0 px-2">
+                              €{groupedItem.totalPrice.toFixed(2)}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                // Remove all items in this group
+                                groupedItem.items.forEach(item => onRemoveItem(item.id));
+                              }}
+                              className="h-6 w-6 p-0 text-destructive hover:text-destructive shrink-0"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onRemoveItem(item.id)}
-                          className="h-6 w-6 p-0 text-destructive hover:text-destructive shrink-0"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+
+                        {/* Customization Breakdown */}
+                        {groupedItem.customizationBreakdown.length > 0 && (
+                          <div className="ml-6 space-y-1">
+                            {groupedItem.customizationBreakdown.map((breakdown, breakdownIndex) => (
+                              <div key={breakdownIndex} className="flex items-center justify-between">
+                                <p className="text-xs text-muted-foreground line-clamp-3">
+                                  {formatCustomizationsForDisplay([breakdown.customizations])[0]}
+                                </p>
+                                {breakdown.quantity > 1 && (
+                                  <Badge variant="outline" className="text-xs px-2 py-0">
+                                    {breakdown.quantity}x
+                                  </Badge>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

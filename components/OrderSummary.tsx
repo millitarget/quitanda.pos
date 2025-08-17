@@ -5,6 +5,7 @@ import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { Trash2 } from 'lucide-react';
 import { OrderItem } from '../App';
+import { groupOrderItems, formatCustomizationsForDisplay, GroupedOrderItem } from '../utils/orderGrouping';
 
 interface OrderSummaryProps {
   items: OrderItem[];
@@ -21,35 +22,8 @@ export function OrderSummary({
   onSubmitOrder, 
   onClearOrder 
 }: OrderSummaryProps) {
-  const total = items.reduce((sum, item) => sum + item.price, 0);
-
-  const formatCustomizations = (customizations: OrderItem['customizations']) => {
-    const parts = [];
-    
-    if (customizations.sauces && customizations.sauces.length > 0) {
-      const sauceLabels: Record<string, string> = {
-        'com-picante': 'Com Picante',
-        'sem-picante': 'Sem Picante',
-        'picante-sem-alho': 'Picante sem Alho',
-        'molho-da-guia': 'Molho da Guia',
-        'muito-molho': 'Muito Molho',
-      };
-      const formattedSauces = customizations.sauces.map(sauce => 
-        sauceLabels[sauce] || sauce
-      ).join(', ');
-      parts.push(formattedSauces);
-    }
-    
-    if (customizations.chickenType) {
-      const chickenLabels: Record<string, string> = {
-        'lourinho': 'Lourinho',
-        'bem-passado': 'Bem Passado',
-      };
-      parts.push(chickenLabels[customizations.chickenType] || customizations.chickenType);
-    }
-    
-    return parts.length > 0 ? parts.join(' | ') : null;
-  };
+  const groupedOrder = groupOrderItems(items);
+  const total = groupedOrder.total;
 
   return (
     <Card className="h-full flex flex-col rounded-none border-0">
@@ -81,29 +55,60 @@ export function OrderSummary({
           <>
             <ScrollArea className="flex-1 -mx-2">
               <div className="space-y-3 px-2">
-                {items.map((item, index) => (
-                  <div key={item.id} className="flex items-start justify-between gap-2 pb-3 border-b border-border/50 last:border-0">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm leading-tight">
-                        {item.name}
-                      </p>
-                      {formatCustomizations(item.customizations) && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatCustomizations(item.customizations)}
-                        </p>
-                      )}
-                      <Badge variant="secondary" className="mt-2 text-xs">
-                        €{item.price.toFixed(2)}
-                      </Badge>
+                {groupedOrder.items.map((groupedItem, index) => (
+                  <div key={`${groupedItem.name}-${index}`} className="pb-3 border-b border-border/50 last:border-0">
+                    {/* Item Header with Total Quantity */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          {groupedItem.quantity > 1 && (
+                            <Badge 
+                              variant="default" 
+                              className="bg-primary text-primary-foreground text-xs font-bold px-2 py-1"
+                            >
+                              {groupedItem.quantity}x
+                            </Badge>
+                          )}
+                          <p className="font-medium text-sm leading-tight">
+                            {groupedItem.name}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          €{groupedItem.totalPrice.toFixed(2)}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            // Remove all items in this group
+                            groupedItem.items.forEach(item => onRemoveItem(item.id));
+                          }}
+                          className="h-6 w-6 p-0 text-destructive hover:text-destructive shrink-0"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemoveItem(item.id)}
-                      className="h-6 w-6 p-0 text-destructive hover:text-destructive shrink-0"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+
+                    {/* Customization Breakdown */}
+                    {groupedItem.customizationBreakdown.length > 0 && (
+                      <div className="ml-6 space-y-1">
+                        {groupedItem.customizationBreakdown.map((breakdown, breakdownIndex) => (
+                          <div key={breakdownIndex} className="flex items-center justify-between">
+                            <p className="text-xs text-muted-foreground">
+                              {formatCustomizationsForDisplay([breakdown.customizations])[0]}
+                            </p>
+                            {breakdown.quantity > 1 && (
+                              <Badge variant="outline" className="text-xs px-2 py-0">
+                                {breakdown.quantity}x
+                              </Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
