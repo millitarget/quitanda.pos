@@ -99,7 +99,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
 
   return (
     <div className="p-2">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="auto-grid gap-2">
         {items.map((item) => {
         const needsCustomization = isMeatItem(item.name);
         const isExpanded = expandedItem === item.id;
@@ -108,48 +108,53 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
         return (
           <Card key={item.id} className="overflow-hidden rounded-lg shadow-xs border border-border/60">
             <CardContent className="p-0">
-              <div className="p-2 flex flex-col gap-2">
-                <div className="min-h-[38px]">
-                  <h3 className="font-medium text-[13px] leading-tight line-clamp-2">{item.name}</h3>
-                  {item.description && (
-                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="text-[11px] py-0.5 px-1.5 rounded">
-                    €{item.price.toFixed(2)}
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    {needsCustomization && (
-                      <Collapsible
-                        open={isExpanded}
-                        onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
+              {/* Make entire tile quick-add for speed; inner buttons stop propagation */}
+              <button
+                type="button"
+                onClick={() => handleQuickAdd(item)}
+                className="w-full text-left"
+              >
+                <div className="p-2 flex flex-col gap-2">
+                  <div className="min-h-[32px]">
+                    <h3 className="font-medium text-[13px] leading-tight line-clamp-2">{item.name}</h3>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="text-[11px] py-0.5 px-1.5 rounded">
+                      €{item.price.toFixed(2)}
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      {needsCustomization && (
+                        <Collapsible
+                          open={isExpanded}
+                          onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
+                        >
+                          <CollapsibleTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 w-8 p-0 rounded-md"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {isExpanded ? 
+                                <ChevronUp className="h-3 w-3" /> : 
+                                <ChevronDown className="h-3 w-3" />
+                              }
+                            </Button>
+                          </CollapsibleTrigger>
+                        </Collapsible>
+                      )}
+                      <Button
+                        onClick={(e) => { e.stopPropagation(); handleQuickAdd(item); }}
+                        size="sm"
+                        className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-xs rounded-md"
+                        aria-label={`Adicionar ${item.name}`}
                       >
-                        <CollapsibleTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0 rounded-md"
-                          >
-                            {isExpanded ? 
-                              <ChevronUp className="h-3 w-3" /> : 
-                              <ChevronDown className="h-3 w-3" />
-                            }
-                          </Button>
-                        </CollapsibleTrigger>
-                      </Collapsible>
-                    )}
-                    <Button
-                      onClick={() => handleQuickAdd(item)}
-                      size="sm"
-                      className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-xs rounded-md"
-                      aria-label={`Adicionar ${item.name}`}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </button>
 
               {needsCustomization && (
                 <Collapsible
@@ -157,7 +162,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                   onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
                 >
                   <CollapsibleContent>
-                    <div className="border-t bg-muted/30 p-2 space-y-2">
+                    <div className="border-t bg-muted/30 p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
                       <div>
                         <h4 className="font-medium mb-2 text-[11px]">Molhos (opcional - múltipla escolha)</h4>
                         <div className="grid grid-cols-2 gap-1.5">
