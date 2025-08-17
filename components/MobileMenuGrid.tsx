@@ -98,8 +98,9 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
   };
 
   return (
-    <div className="p-3 space-y-3">
-      {items.map((item) => {
+    <div className="p-2">
+      <div className="grid grid-cols-2 gap-2">
+        {items.map((item) => {
         const needsCustomization = isMeatItem(item.name);
         const isExpanded = expandedItem === item.id;
         const hasCustomizations = getSelectedCustomizations(item);
@@ -107,65 +108,59 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
         return (
           <Card key={item.id} className="overflow-hidden rounded-lg shadow-xs border border-border/60">
             <CardContent className="p-0">
-              {/* Main Item Row */}
-              <div className="flex items-center justify-between p-3">
-                <div className="flex-1 min-w-0 pr-3">
-                  <h3 className="font-medium text-sm leading-tight">{item.name}</h3>
+              <div className="p-2 flex flex-col gap-2">
+                <div className="min-h-[38px]">
+                  <h3 className="font-medium text-[13px] leading-tight line-clamp-2">{item.name}</h3>
                   {item.description && (
-                    <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
                   )}
-                  {hasCustomizations && (
-                    <p className="text-xs font-medium text-primary mt-1">{hasCustomizations}</p>
-                  )}
-                  <Badge variant="secondary" className="mt-2 text-xs py-0.5 px-2 rounded-md">
+                </div>
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="text-[11px] py-0.5 px-1.5 rounded">
                     €{item.price.toFixed(2)}
                   </Badge>
-                </div>
-                
-                <div className="flex items-center gap-1">
-                  {needsCustomization && (
-                    <Collapsible
-                      open={isExpanded}
-                      onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
+                  <div className="flex items-center gap-1">
+                    {needsCustomization && (
+                      <Collapsible
+                        open={isExpanded}
+                        onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
+                      >
+                        <CollapsibleTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 rounded-md"
+                          >
+                            {isExpanded ? 
+                              <ChevronUp className="h-3 w-3" /> : 
+                              <ChevronDown className="h-3 w-3" />
+                            }
+                          </Button>
+                        </CollapsibleTrigger>
+                      </Collapsible>
+                    )}
+                    <Button
+                      onClick={() => handleQuickAdd(item)}
+                      size="sm"
+                      className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-xs rounded-md"
+                      aria-label={`Adicionar ${item.name}`}
                     >
-                      <CollapsibleTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 w-8 p-0 rounded-md"
-                        >
-                          {isExpanded ? 
-                            <ChevronUp className="h-3 w-3" /> : 
-                            <ChevronDown className="h-3 w-3" />
-                          }
-                        </Button>
-                      </CollapsibleTrigger>
-                    </Collapsible>
-                  )}
-                  
-                  <Button
-                    onClick={() => handleQuickAdd(item)}
-                    size="sm"
-                    className="h-8 px-3 bg-green-600 hover:bg-green-700 text-xs rounded-md"
-                  >
-                    <Plus className="h-3 w-3 mr-1" />
-                    +
-                  </Button>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              {/* Customization Options */}
               {needsCustomization && (
                 <Collapsible
                   open={isExpanded}
                   onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
                 >
                   <CollapsibleContent>
-                    <div className="border-t bg-muted/30 p-3 space-y-3">
-                      {/* Multi-Sauce Options */}
+                    <div className="border-t bg-muted/30 p-2 space-y-2">
                       <div>
-                        <h4 className="font-medium mb-2 text-xs">Molhos (opcional - múltipla escolha)</h4>
-                        <div className="grid grid-cols-2 gap-2">
+                        <h4 className="font-medium mb-2 text-[11px]">Molhos (opcional - múltipla escolha)</h4>
+                        <div className="grid grid-cols-2 gap-1.5">
                           {sauceOptions.map((sauce) => {
                             const isSelected = selectedSauces[item.id]?.includes(sauce.value) || false;
                             return (
@@ -174,7 +169,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                                 variant={isSelected ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleSauceToggle(item.id, sauce.value)}
-                                className={`h-8 px-2 text-xs whitespace-normal leading-tight rounded-md ${
+                                className={`h-8 px-2 text-[11px] whitespace-normal leading-tight rounded-md ${
                                   isSelected ? 'bg-green-600 hover:bg-green-700 text-white' : ''
                                 }`}
                               >
@@ -184,24 +179,23 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                           })}
                         </div>
                         {selectedSauces[item.id] && selectedSauces[item.id].length > 0 && (
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-[11px] text-muted-foreground mt-1">
                             {selectedSauces[item.id].length} molho{selectedSauces[item.id].length > 1 ? 's' : ''} selecionado{selectedSauces[item.id].length > 1 ? 's' : ''}
                           </p>
                         )}
                       </div>
-
-                      {/* Chicken Type Options */}
+                      
                       {isChickenItem(item.name) && (
                         <div>
-                          <h4 className="font-medium mb-2 text-xs">Cozedura (opcional)</h4>
-                          <div className="grid grid-cols-2 gap-2">
+                          <h4 className="font-medium mb-2 text-[11px]">Cozedura (opcional)</h4>
+                          <div className="grid grid-cols-2 gap-1.5">
                             {chickenOptions.map((chicken) => (
                               <Button
                                 key={chicken.value}
                                 variant={selectedChickenTypes[item.id] === chicken.value ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleChickenTypeSelect(item.id, chicken.value)}
-                                className={`h-8 px-2 text-xs rounded-md ${
+                                className={`h-8 px-2 text-[11px] rounded-md ${
                                   selectedChickenTypes[item.id] === chicken.value ? 'bg-green-600 hover:bg-green-700 text-white' : ''
                                 }`}
                               >
@@ -212,7 +206,6 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                         </div>
                       )}
                       
-                      {/* Quick Add with Settings */}
                       <Button
                         onClick={() => handleQuickAdd(item)}
                         className="w-full bg-green-600 hover:bg-green-700 h-9 text-sm rounded-md text-white"
@@ -228,6 +221,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
           </Card>
         );
       })}
+      </div>
     </div>
   );
 }

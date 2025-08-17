@@ -288,6 +288,14 @@ body {
   transform: scale(0.95);
 }
 
+/* Utility: two-line clamp without plugin */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Optimize animations for mobile */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
