@@ -5,10 +5,13 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { Alert, AlertDescription } from './components/ui/alert';
-import { ChefHat, Smartphone, Wifi, WifiOff } from 'lucide-react';
+import { ChefHat, Smartphone, Wifi, WifiOff, Flame, Utensils } from 'lucide-react';
 import { ordersApi, healthApi } from './utils/api';
 import { toast, Toaster } from 'sonner';
 import { useDeviceOptimization } from './hooks/useDeviceOptimization';
+import { GrillDisplay } from './components/GrillDisplay';
+import { KitchenPrepDisplay } from './components/KitchenPrepDisplay';
+import { FryerDisplay } from './components/FryerDisplay';
 
 export interface OrderItem {
   id: string;
@@ -34,7 +37,7 @@ export interface Order {
 
 function App() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [currentView, setCurrentView] = useState<'orders' | 'kitchen'>('orders');
+  const [currentView, setCurrentView] = useState<'orders' | 'balcao' | 'grill' | 'kitchenPrep' | 'fryer'>('orders');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isOnline, setIsOnline] = useState(true);
@@ -89,7 +92,7 @@ function App() {
     
     // Set up periodic refresh for kitchen display
     const interval = setInterval(() => {
-      if (currentView === 'kitchen') {
+      if (currentView !== 'orders') {
         loadOrders();
       }
       checkConnectivity();
@@ -184,13 +187,13 @@ function App() {
               <span className="mobile-text-base tablet-text-lg font-medium">Pedidos</span>
             </Button>
             <Button
-              variant={currentView === 'kitchen' ? 'default' : 'outline'}
+              variant={currentView === 'balcao' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setCurrentView('kitchen')}
+              onClick={() => setCurrentView('balcao')}
               className="flex-1 mobile-btn touch-target relative"
             >
               <ChefHat className="h-4 w-4 mr-2" />
-              <span className="mobile-text-base tablet-text-lg font-medium">Cozinha</span>
+              <span className="mobile-text-base tablet-text-lg font-medium">Balcão</span>
               {pendingOrders > 0 && (
                 <Badge 
                   variant="destructive" 
@@ -199,6 +202,33 @@ function App() {
                   {pendingOrders}
                 </Badge>
               )}
+            </Button>
+            <Button
+              variant={currentView === 'grill' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCurrentView('grill')}
+              className="flex-1 mobile-btn touch-target"
+            >
+              <Flame className="h-4 w-4 mr-2" />
+              <span className="mobile-text-base tablet-text-lg font-medium">Churrasqueira</span>
+            </Button>
+            <Button
+              variant={currentView === 'kitchenPrep' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCurrentView('kitchenPrep')}
+              className="flex-1 mobile-btn touch-target"
+            >
+              <Utensils className="h-4 w-4 mr-2" />
+              <span className="mobile-text-base tablet-text-lg font-medium">Cozinha</span>
+            </Button>
+            <Button
+              variant={currentView === 'fryer' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCurrentView('fryer')}
+              className="flex-1 mobile-btn touch-target"
+            >
+              <Utensils className="h-4 w-4 mr-2" />
+              <span className="mobile-text-base tablet-text-lg font-medium">Fritadeira</span>
             </Button>
           </div>
           
@@ -264,11 +294,29 @@ function App() {
             existingOrders={orders}
             loading={loading}
           />
-        ) : (
+        ) : currentView === 'balcao' ? (
           <KitchenDisplay 
             orders={orders}
             onUpdateStatus={updateOrderStatus}
             onRemoveOrder={removeOrder}
+            loading={loading}
+            onRefresh={loadOrders}
+          />
+        ) : currentView === 'grill' ? (
+          <GrillDisplay
+            orders={orders}
+            loading={loading}
+            onRefresh={loadOrders}
+          />
+        ) : currentView === 'kitchenPrep' ? (
+          <KitchenPrepDisplay
+            orders={orders}
+            loading={loading}
+            onRefresh={loadOrders}
+          />
+        ) : (
+          <FryerDisplay
+            orders={orders}
             loading={loading}
             onRefresh={loadOrders}
           />
