@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
+import { Input } from './ui/input';
 import { MobileMenuGrid } from './MobileMenuGrid';
 import { FloatingOrderSummary } from './FloatingOrderSummary';
 import { NumberPadModal } from './NumberPadModal';
@@ -9,6 +10,7 @@ import { Order, OrderItem } from '../App';
 import { ShoppingCart, Edit3, RefreshCw } from 'lucide-react';
 import { queueApi, menuApi } from '../utils/api';
 import { toast } from 'sonner';
+import { groupOrderItems, formatCustomizationsForDisplay } from '../utils/orderGrouping';
 
 interface OrderTakingProps {
   onAddOrder: (order: Omit<Order, 'id' | 'timestamp'>) => void;
@@ -90,6 +92,8 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
   const [menuData, setMenuData] = useState<MenuItem[]>(defaultMenuData);
   const [menuLoading, setMenuLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [search, setSearch] = useState('');
+  const [quantityMultiplier, setQuantityMultiplier] = useState<number>(1);
 
   const categories = ['Todos', 'Carne', 'Acompanhamentos', 'Bebidas', 'Peixe', 'Vinhos'];
 
@@ -137,15 +141,17 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
   }, [existingOrders.length]);
   
   const addItemToOrder = (menuItem: MenuItem, customizations: { sauces?: string[]; chickenType?: string }) => {
-    const orderItem: OrderItem = {
-      id: `${menuItem.id}-${Date.now()}`,
-      name: menuItem.name,
-      price: menuItem.price,
-      category: menuItem.category,
-      customizations,
-    };
-    
-    setCurrentOrder(prev => [...prev, orderItem]);
+    const newItems: OrderItem[] = [];
+    for (let i = 0; i < Math.max(1, quantityMultiplier); i++) {
+      newItems.push({
+        id: `${menuItem.id}-${Date.now()}-${i}`,
+        name: menuItem.name,
+        price: menuItem.price,
+        category: menuItem.category,
+        customizations,
+      });
+    }
+    setCurrentOrder(prev => [...prev, ...newItems]);
   };
 
   const removeItemFromOrder = (itemId: string) => {
@@ -190,6 +196,37 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
 
   const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
   const isQueueNumberTaken = existingOrders.some(order => order.queueNumber === queueNumber);
+
+  const handleChangeQuantity = (
+    action: 'inc' | 'dec',
+    match: { name: string; price: number; category: string; customizations: OrderItem['customizations'] }
+  ) => {
+    if (action === 'inc') {
+      const newItem: OrderItem = {
+        id: `${match.name}-${Date.now()}`,
+        name: match.name,
+        price: match.price,
+        category: match.category,
+        customizations: match.customizations,
+      };
+      setCurrentOrder(prev => [...prev, newItem]);
+      return;
+    }
+    setCurrentOrder(prev => {
+      const idx = prev.findIndex(it =>
+        it.name === match.name &&
+        it.price === match.price &&
+        it.category === match.category &&
+        JSON.stringify(it.customizations) === JSON.stringify(match.customizations)
+      );
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy.splice(idx, 1);
+        return copy;
+      }
+      return prev;
+    });
+  };
 
   return (
     <div className="flex flex-col h-full bg-background relative">
@@ -247,7 +284,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         </div>
       </div>
 
-      {/* Category Navigation */}
+      {/* Category Navigation + Search + Qty Multiplier */}
       <div className="border-b bg-card sticky top-[44px] z-30">
         <ScrollArea className="w-full">
           <div className="flex gap-2 px-3 py-2 min-w-max">
@@ -264,22 +301,107 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
             ))}
           </div>
         </ScrollArea>
+        <div className="px-3 pb-2 flex items-center gap-2">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Procurar item..."
+            className="h-9 text-sm"
+          />
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 5].map((q) => (
+              <Button
+                key={q}
+                variant={quantityMultiplier === q ? 'default' : 'outline'}
+                size="sm"
+                className="h-9 px-2 text-xs rounded-md"
+                onClick={() => setQuantityMultiplier(q)}
+              >
+                x{q}
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Menu Items Grid */}
-      <div className="flex-1 overflow-auto">
-        {menuLoading ? (
-          <div className="flex items-center justify-center h-32 gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="text-sm text-muted-foreground">A carregar menu...</span>
+      {/* Desktop 15'' layout: grid with right sidebar */}
+      <div className="flex-1 overflow-auto lg:grid lg:grid-cols-[1fr,360px] lg:gap-3">
+        <div>
+          {menuLoading ? (
+            <div className="flex items-center justify-center h-32 gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="text-sm text-muted-foreground">A carregar menu...</span>
+            </div>
+          ) : (
+            <MobileMenuGrid
+              category={selectedCategory}
+              items={menuData
+                .filter(item => selectedCategory === 'Todos' || item.category === selectedCategory)
+                .filter(item => !search || item.name.toLowerCase().includes(search.toLowerCase()))}
+              onAddItem={addItemToOrder}
+            />
+          )}
+        </div>
+
+        {/* Sidebar summary (visible on lg+) */}
+        <div className="hidden lg:block sticky top-[96px] self-start max-h-[calc(100vh-120px)] overflow-auto">
+          <div className="border rounded-md bg-card">
+            <div className="p-3 border-b">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Carrinho</span>
+                <Badge variant="secondary" className="text-sm">€{total.toFixed(2)}</Badge>
+              </div>
+            </div>
+            <div className="p-3 space-y-2">
+              {currentOrder.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Vazio</p>
+              ) : (
+                (() => {
+                  const grouped = groupOrderItems(currentOrder);
+                  return (
+                    <div className="space-y-2">
+                      {grouped.items.map((g, idx) => (
+                        <div key={`${g.name}-${idx}`} className="p-2 border rounded">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2">
+                              {g.quantity > 1 && (
+                                <Badge variant="default" className="text-xs px-2 py-0">{g.quantity}x</Badge>
+                              )}
+                              <h4 className="text-sm font-medium leading-tight">{g.name}</h4>
+                            </div>
+                            <Badge variant="secondary" className="text-xs">€{g.totalPrice.toFixed(2)}</Badge>
+                          </div>
+                          {g.customizationBreakdown.map((b, i) => (
+                            <div key={i} className="flex items-center justify-between gap-2 ml-6">
+                              <p className="text-xs text-muted-foreground flex-1">
+                                {formatCustomizationsForDisplay([b.customizations])[0]}
+                              </p>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="outline" size="sm" className="h-6 w-6 p-0"
+                                  onClick={() => handleChangeQuantity('dec', { name: g.name, price: g.price, category: g.category, customizations: b.customizations })}
+                                >-</Button>
+                                <Badge variant="outline" className="text-xs px-2 py-0">{b.quantity}x</Badge>
+                                <Button
+                                  variant="outline" size="sm" className="h-6 w-6 p-0"
+                                  onClick={() => handleChangeQuantity('inc', { name: g.name, price: g.price, category: g.category, customizations: b.customizations })}
+                                >+</Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+            <div className="p-3 border-t grid grid-cols-2 gap-2">
+              <Button variant="outline" onClick={clearOrder} disabled={submitting}>Limpar</Button>
+              <Button onClick={() => submitOrder()} disabled={isQueueNumberTaken || submitting || parentLoading} className="bg-green-600 hover:bg-green-700">Enviar</Button>
+            </div>
           </div>
-        ) : (
-          <MobileMenuGrid
-            category={selectedCategory}
-            items={menuData.filter(item => selectedCategory === 'Todos' || item.category === selectedCategory)}
-            onAddItem={addItemToOrder}
-          />
-        )}
+        </div>
       </div>
 
       {/* Action Bar */}
