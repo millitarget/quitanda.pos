@@ -32,14 +32,14 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
   const [queueNumber, setQueueNumber] = useState<number>(1);
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [menuData, setMenuData] = useState<MenuItem[]>(fallbackMenu);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Carne');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [menuLoading, setMenuLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [search, setSearch] = useState('');
   const [quantityMultiplier, setQuantityMultiplier] = useState<number>(1);
 
-  const categories = ['Carne', 'Acompanhamentos', 'Bebidas', 'Peixe', 'Vinhos'];
+  const categories = ['Todos', 'Carne', 'Acompanhamentos', 'Bebidas', 'Peixe', 'Vinhos'];
 
   const loadMenu = async () => {
     try {
@@ -317,7 +317,7 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
           <MobileMenuGrid
             category={selectedCategory}
             items={menuData
-              .filter(item => item.category === selectedCategory)
+              .filter(item => selectedCategory === 'Todos' || item.category === selectedCategory)
               .filter(item => !search || item.name.toLowerCase().includes(search.toLowerCase()))}
             onAddItem={addItemToOrder}
           />

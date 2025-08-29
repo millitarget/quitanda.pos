@@ -91,7 +91,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
   const [menuLoading, setMenuLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const categories = ['Carne', 'Acompanhamentos', 'Bebidas', 'Peixe', 'Vinhos'];
+  const categories = ['Todos', 'Carne', 'Acompanhamentos', 'Bebidas', 'Peixe', 'Vinhos'];
 
   // Load menu from backend
   const loadMenu = async () => {
@@ -276,7 +276,7 @@ export function OrderTaking({ onAddOrder, existingOrders, loading: parentLoading
         ) : (
           <MobileMenuGrid
             category={selectedCategory}
-            items={menuData.filter(item => item.category === selectedCategory)}
+            items={menuData.filter(item => selectedCategory === 'Todos' || item.category === selectedCategory)}
             onAddItem={addItemToOrder}
           />
         )}

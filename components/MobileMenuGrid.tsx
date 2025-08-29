@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
+import { ChevronDown, Plus } from 'lucide-react';
 import { MenuItem } from './OrderTaking';
 
 interface MobileMenuGridProps {
@@ -26,7 +26,7 @@ const chickenOptions = [
 ];
 
 export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridProps) {
-  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [openItem, setOpenItem] = useState<string | null>(null);
   const [selectedSauces, setSelectedSauces] = useState<Record<string, string[]>>({});
   const [selectedChickenTypes, setSelectedChickenTypes] = useState<Record<string, string>>({});
 
@@ -102,7 +102,7 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
       <div className="auto-grid gap-2">
         {items.map((item) => {
         const needsCustomization = isMeatItem(item.name);
-        const isExpanded = expandedItem === item.id;
+        const isOpen = openItem === item.id;
         const hasCustomizations = getSelectedCustomizations(item);
         
         return (
@@ -124,24 +124,78 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                     </Badge>
                     <div className="flex items-center gap-1">
                       {needsCustomization && (
-                        <Collapsible
-                          open={isExpanded}
-                          onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
-                        >
-                          <CollapsibleTrigger asChild>
+                        <Popover open={isOpen} onOpenChange={(open) => setOpenItem(open ? item.id : null)}>
+                          <PopoverTrigger asChild>
                             <Button
                               variant="outline"
                               size="sm"
                               className="h-8 w-8 p-0 rounded-md"
                               onClick={(e) => e.stopPropagation()}
+                              aria-label={`Personalizar ${item.name}`}
                             >
-                              {isExpanded ? 
-                                <ChevronUp className="h-3 w-3" /> : 
-                                <ChevronDown className="h-3 w-3" />
-                              }
+                              <ChevronDown className="h-3 w-3" />
                             </Button>
-                          </CollapsibleTrigger>
-                        </Collapsible>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[420px] max-w-[90vw] p-2" align="center" sideOffset={8}>
+                            <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                              <div>
+                                <h4 className="font-medium mb-2 text-[11px]">Molhos (opcional - múltipla escolha)</h4>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  {sauceOptions.map((sauce) => {
+                                    const isSelected = selectedSauces[item.id]?.includes(sauce.value) || false;
+                                    return (
+                                      <Button
+                                        key={sauce.value}
+                                        variant={isSelected ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => handleSauceToggle(item.id, sauce.value)}
+                                        className={`h-8 px-2 text-[11px] whitespace-normal leading-tight rounded-md ${
+                                          isSelected ? 'bg-green-600 hover:bg-green-700 text-white' : ''
+                                        }`}
+                                      >
+                                        {sauce.label}
+                                      </Button>
+                                    );
+                                  })}
+                                </div>
+                                {selectedSauces[item.id] && selectedSauces[item.id].length > 0 && (
+                                  <p className="text-[11px] text-muted-foreground mt-1">
+                                    {selectedSauces[item.id].length} molho{selectedSauces[item.id].length > 1 ? 's' : ''} selecionado{selectedSauces[item.id].length > 1 ? 's' : ''}
+                                  </p>
+                                )}
+                              </div>
+
+                              {isChickenItem(item.name) && (
+                                <div>
+                                  <h4 className="font-medium mb-2 text-[11px]">Cozedura (opcional)</h4>
+                                  <div className="grid grid-cols-2 gap-1.5">
+                                    {chickenOptions.map((chicken) => (
+                                      <Button
+                                        key={chicken.value}
+                                        variant={selectedChickenTypes[item.id] === chicken.value ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => handleChickenTypeSelect(item.id, chicken.value)}
+                                        className={`h-8 px-2 text-[11px] rounded-md ${
+                                          selectedChickenTypes[item.id] === chicken.value ? 'bg-green-600 hover:bg-green-700 text-white' : ''
+                                        }`}
+                                      >
+                                        {chicken.label}
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              <Button
+                                onClick={() => { handleQuickAdd(item); setOpenItem(null); }}
+                                className="w-full bg-green-600 hover:bg-green-700 h-9 text-sm rounded-md text-white"
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Adicionar
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       )}
                       <Button
                         onClick={(e) => { e.stopPropagation(); handleQuickAdd(item); }}
@@ -155,73 +209,6 @@ export function MobileMenuGrid({ category, items, onAddItem }: MobileMenuGridPro
                   </div>
                 </div>
               </button>
-
-              {needsCustomization && (
-                <Collapsible
-                  open={isExpanded}
-                  onOpenChange={(open) => setExpandedItem(open ? item.id : null)}
-                >
-                  <CollapsibleContent>
-                    <div className="border-t bg-muted/30 p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
-                      <div>
-                        <h4 className="font-medium mb-2 text-[11px]">Molhos (opcional - múltipla escolha)</h4>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {sauceOptions.map((sauce) => {
-                            const isSelected = selectedSauces[item.id]?.includes(sauce.value) || false;
-                            return (
-                              <Button
-                                key={sauce.value}
-                                variant={isSelected ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => handleSauceToggle(item.id, sauce.value)}
-                                className={`h-8 px-2 text-[11px] whitespace-normal leading-tight rounded-md ${
-                                  isSelected ? 'bg-green-600 hover:bg-green-700 text-white' : ''
-                                }`}
-                              >
-                                {sauce.label}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                        {selectedSauces[item.id] && selectedSauces[item.id].length > 0 && (
-                          <p className="text-[11px] text-muted-foreground mt-1">
-                            {selectedSauces[item.id].length} molho{selectedSauces[item.id].length > 1 ? 's' : ''} selecionado{selectedSauces[item.id].length > 1 ? 's' : ''}
-                          </p>
-                        )}
-                      </div>
-                      
-                      {isChickenItem(item.name) && (
-                        <div>
-                          <h4 className="font-medium mb-2 text-[11px]">Cozedura (opcional)</h4>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {chickenOptions.map((chicken) => (
-                              <Button
-                                key={chicken.value}
-                                variant={selectedChickenTypes[item.id] === chicken.value ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => handleChickenTypeSelect(item.id, chicken.value)}
-                                className={`h-8 px-2 text-[11px] rounded-md ${
-                                  selectedChickenTypes[item.id] === chicken.value ? 'bg-green-600 hover:bg-green-700 text-white' : ''
-                                }`}
-                              >
-                                {chicken.label}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      <Button
-                        onClick={() => handleQuickAdd(item)}
-                        className="w-full bg-green-600 hover:bg-green-700 h-9 text-sm rounded-md text-white"
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        Adicionar
-                      </Button>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              )}
             </CardContent>
           </Card>
         );
