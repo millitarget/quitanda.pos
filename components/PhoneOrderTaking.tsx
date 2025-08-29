@@ -36,6 +36,8 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
   const [menuLoading, setMenuLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [search, setSearch] = useState('');
+  const [quantityMultiplier, setQuantityMultiplier] = useState<number>(1);
 
   const categories = ['Carne', 'Acompanhamentos', 'Bebidas', 'Peixe', 'Vinhos'];
 
@@ -80,14 +82,17 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
   }, [existingOrders.length]);
 
   const addItemToOrder = (menuItem: MenuItem, customizations: { sauces?: string[]; chickenType?: string }) => {
-    const orderItem: OrderItem = {
-      id: `${menuItem.id}-${Date.now()}`,
-      name: menuItem.name,
-      price: menuItem.price,
-      category: menuItem.category,
-      customizations,
-    };
-    setCurrentOrder(prev => [...prev, orderItem]);
+    const newItems: OrderItem[] = [];
+    for (let i = 0; i < Math.max(1, quantityMultiplier); i++) {
+      newItems.push({
+        id: `${menuItem.id}-${Date.now()}-${i}`,
+        name: menuItem.name,
+        price: menuItem.price,
+        category: menuItem.category,
+        customizations,
+      });
+    }
+    setCurrentOrder(prev => [...prev, ...newItems]);
   };
 
   const removeItemFromOrder = (itemId: string) => {
@@ -132,6 +137,57 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
   };
 
   const isQueueNumberTaken = existingOrders.some(order => order.queueNumber === queueNumber);
+
+  // Quantity change from summary per customization set
+  const handleChangeQuantity = (
+    action: 'inc' | 'dec',
+    match: { name: string; price: number; category: string; customizations: OrderItem['customizations'] }
+  ) => {
+    if (action === 'inc') {
+      const newItem: OrderItem = {
+        id: `${match.name}-${Date.now()}`,
+        name: match.name,
+        price: match.price,
+        category: match.category,
+        customizations: match.customizations,
+      };
+      setCurrentOrder(prev => [...prev, newItem]);
+      return;
+    }
+    // dec: remove first matching item
+    setCurrentOrder(prev => {
+      const idx = prev.findIndex(it =>
+        it.name === match.name &&
+        it.price === match.price &&
+        it.category === match.category &&
+        JSON.stringify(it.customizations) === JSON.stringify(match.customizations)
+      );
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy.splice(idx, 1);
+        return copy;
+      }
+      return prev;
+    });
+  };
+
+  // Helper: compute time strings
+  const formatTime = (date: Date) => {
+    const hh = `${date.getHours()}`.padStart(2, '0');
+    const mm = `${date.getMinutes()}`.padStart(2, '0');
+    return `${hh}:${mm}`;
+  };
+  const setTimeNow = () => setPickupTime(formatTime(new Date()));
+  const addMinutes = (mins: number) => {
+    const base = pickupTime ? (() => {
+      const [h, m] = pickupTime.split(':').map(n => parseInt(n));
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      return d;
+    })() : new Date();
+    base.setMinutes(base.getMinutes() + mins);
+    setPickupTime(formatTime(base));
+  };
 
   return (
     <div className="flex flex-col h-full bg-background relative">
@@ -198,23 +254,56 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
         </div>
       </div>
 
-      {/* Category Navigation */}
+      {/* Category Navigation + Search + Qty Multiplier + Time Chips */}
       <div className="border-b bg-card sticky top-[44px] z-30">
-        <ScrollArea className="w-full">
-          <div className="flex gap-2 px-3 py-2 min-w-max">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="whitespace-nowrap px-3 py-2 h-9 text-sm rounded-md"
-              >
-                {category}
-              </Button>
-            ))}
+        <div className="px-3 py-2 space-y-2">
+          <div className="flex gap-2">
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 min-w-max">
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                    className="whitespace-nowrap px-3 py-2 h-9 text-sm rounded-md"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
-        </ScrollArea>
+
+          <div className="flex gap-2 items-center">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Procurar item..."
+              className="h-9 text-sm"
+            />
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 5].map((q) => (
+                <Button
+                  key={q}
+                  variant={quantityMultiplier === q ? 'default' : 'outline'}
+                  size="sm"
+                  className="h-9 px-2 text-xs rounded-md"
+                  onClick={() => setQuantityMultiplier(q)}
+                >
+                  x{q}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-1 items-center">
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={setTimeNow}>Agora</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => addMinutes(15)}>+15</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => addMinutes(30)}>+30</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => addMinutes(45)}>+45</Button>
+          </div>
+        </div>
       </div>
 
       {/* Menu Items Grid */}
@@ -227,7 +316,9 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
         ) : (
           <MobileMenuGrid
             category={selectedCategory}
-            items={menuData.filter(item => item.category === selectedCategory)}
+            items={menuData
+              .filter(item => item.category === selectedCategory)
+              .filter(item => !search || item.name.toLowerCase().includes(search.toLowerCase()))}
             onAddItem={addItemToOrder}
           />
         )}
@@ -273,6 +364,7 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
         onClearOrder={clearOrder}
         total={total}
         submitting={submitting}
+        onChangeQuantity={handleChangeQuantity}
       />
     </div>
   );

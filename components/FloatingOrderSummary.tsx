@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
-import { Trash2, X, FileText, RefreshCw } from 'lucide-react';
+import { Trash2, X, FileText, RefreshCw, Plus, Minus } from 'lucide-react';
 import { OrderItem } from '../App';
 import { OrderNotesModal } from './OrderNotesModal';
 import { groupOrderItems, formatCustomizationsForDisplay } from '../utils/orderGrouping';
@@ -17,6 +17,10 @@ interface FloatingOrderSummaryProps {
   onClearOrder: () => void;
   total: number;
   submitting?: boolean;
+  onChangeQuantity?: (
+    action: 'inc' | 'dec',
+    match: { name: string; price: number; category: string; customizations: OrderItem['customizations'] }
+  ) => void;
 }
 
 export function FloatingOrderSummary({ 
@@ -28,6 +32,7 @@ export function FloatingOrderSummary({
   onClearOrder,
   total,
   submitting = false,
+  onChangeQuantity,
 }: FloatingOrderSummaryProps) {
   const [orderNotes, setOrderNotes] = useState('');
   const [showNotesModal, setShowNotesModal] = useState(false);
@@ -129,15 +134,47 @@ export function FloatingOrderSummary({
                         {groupedItem.customizationBreakdown.length > 0 && (
                           <div className="ml-6 space-y-1">
                             {groupedItem.customizationBreakdown.map((breakdown, breakdownIndex) => (
-                              <div key={breakdownIndex} className="flex items-center justify-between">
-                                <p className="text-xs text-muted-foreground line-clamp-3">
+                              <div key={breakdownIndex} className="flex items-center justify-between gap-2">
+                                <p className="text-xs text-muted-foreground line-clamp-3 flex-1">
                                   {formatCustomizationsForDisplay([breakdown.customizations])[0]}
                                 </p>
-                                {breakdown.quantity > 1 && (
-                                  <Badge variant="outline" className="text-xs px-2 py-0">
+                                <div className="flex items-center gap-1">
+                                  {onChangeQuantity && (
+                                    <>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onClick={() => onChangeQuantity('dec', {
+                                          name: groupedItem.name,
+                                          price: groupedItem.price,
+                                          category: groupedItem.category,
+                                          customizations: breakdown.customizations,
+                                        })}
+                                      >
+                                        <Minus className="h-3 w-3" />
+                                      </Button>
+                                    </>
+                                  )}
+                                  <Badge variant="outline" className="text-xs px-2 py-0 min-w-[28px] text-center">
                                     {breakdown.quantity}x
                                   </Badge>
-                                )}
+                                  {onChangeQuantity && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => onChangeQuantity('inc', {
+                                        name: groupedItem.name,
+                                        price: groupedItem.price,
+                                        category: groupedItem.category,
+                                        customizations: breakdown.customizations,
+                                      })}
+                                    >
+                                      <Plus className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
                             ))}
                           </div>
