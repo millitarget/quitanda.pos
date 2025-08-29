@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Delete, Check } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface NumberPadModalProps {
   isOpen: boolean;
@@ -20,6 +21,25 @@ export function NumberPadModal({
   existingNumbers 
 }: NumberPadModalProps) {
   const [inputValue, setInputValue] = useState(currentNumber.toString());
+  const suggestNextFree = () => {
+    if (existingNumbers.length === 0) return 1;
+    const sorted = [...existingNumbers].sort((a,b) => a-b);
+    let candidate = 1;
+    for (const n of sorted) {
+      if (n === candidate) candidate++;
+      if (n > candidate) break;
+    }
+    return candidate;
+  };
+  useEffect(() => {
+    // If current is taken, suggest next free
+    const num = parseInt(inputValue);
+    if (existingNumbers.includes(num)) {
+      const next = suggestNextFree();
+      setInputValue(next.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [existingNumbers.join(',')]);
 
   const handleNumberPress = (digit: string) => {
     if (inputValue === '0') {
@@ -71,6 +91,9 @@ export function NumberPadModal({
               <Badge variant="destructive" className="mt-2">
                 Número já usado
               </Badge>
+            )}
+            {!isNumberTaken && (
+              <div className="text-xs text-muted-foreground mt-1">Sugestão: próximo livre é {suggestNextFree()}</div>
             )}
           </div>
 

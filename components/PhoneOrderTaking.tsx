@@ -137,6 +137,8 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
   };
 
   const isQueueNumberTaken = existingOrders.some(order => order.queueNumber === queueNumber);
+  const isNameValid = customerName.trim().length > 0;
+  const isTimeValid = pickupTime.trim().length > 0;
 
   // Quantity change from summary per customization set
   const handleChangeQuantity = (
@@ -202,8 +204,12 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Cliente"
-                className="h-9 text-sm"
+                aria-invalid={!isNameValid}
+                className={`h-9 text-sm ${!isNameValid ? 'border-red-500' : ''}`}
               />
+              {!isNameValid && (
+                <span className="text-[10px] text-red-600">Obrigatório</span>
+              )}
             </div>
             <div className="flex flex-col gap-1 w-[130px]">
               <Label htmlFor="pickupTime" className="text-[11px]">Hora</Label>
@@ -212,8 +218,12 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
                 type="time"
                 value={pickupTime}
                 onChange={(e) => setPickupTime(e.target.value)}
-                className="h-9 text-sm"
+                aria-invalid={!isTimeValid}
+                className={`h-9 text-sm ${!isTimeValid ? 'border-red-500' : ''}`}
               />
+              {!isTimeValid && (
+                <span className="text-[10px] text-red-600">Obrigatório</span>
+              )}
             </div>
             {isQueueNumberTaken && (
               <Badge variant="destructive" className="text-xs py-0 px-2 rounded mt-5">Usado</Badge>
@@ -338,7 +348,7 @@ export function PhoneOrderTaking({ onAddOrder, existingOrders, loading: parentLo
             </Button>
             <Button 
               onClick={submitOrder}
-              disabled={submitting || parentLoading || isQueueNumberTaken}
+              disabled={submitting || parentLoading || isQueueNumberTaken || !isNameValid || !isTimeValid}
               className="flex-2 h-10 text-sm rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
             >
               {submitting ? (

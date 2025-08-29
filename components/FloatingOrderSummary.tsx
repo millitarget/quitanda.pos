@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
-import { Trash2, X, FileText, RefreshCw, Plus, Minus } from 'lucide-react';
+import { Trash2, X, FileText, RefreshCw, Plus, Minus, RotateCcw } from 'lucide-react';
 import { OrderItem } from '../App';
 import { OrderNotesModal } from './OrderNotesModal';
 import { groupOrderItems, formatCustomizationsForDisplay } from '../utils/orderGrouping';
@@ -46,8 +46,12 @@ export function FloatingOrderSummary({
   };
 
   const handleClear = () => {
+    const previous = [...items];
     onClearOrder();
     setOrderNotes(''); // Reset order notes when clearing
+    // Simple undo via custom event; consuming component can listen or ignore
+    const ev = new CustomEvent('cart:cleared', { detail: { previous } });
+    window.dispatchEvent(ev);
   };
 
   return (
