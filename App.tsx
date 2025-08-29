@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { OrderTaking } from './components/OrderTaking';
+import { PhoneOrderTaking } from './components/PhoneOrderTaking';
 import { KitchenDisplay } from './components/KitchenDisplay';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { Button } from './components/ui/button';
@@ -37,7 +38,7 @@ export interface Order {
 
 function App() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [currentView, setCurrentView] = useState<'orders' | 'balcao' | 'grill' | 'kitchenPrep' | 'fryer'>('orders');
+  const [currentView, setCurrentView] = useState<'orders' | 'phone' | 'balcao' | 'grill' | 'kitchenPrep' | 'fryer'>('orders');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isOnline, setIsOnline] = useState(true);
@@ -187,6 +188,15 @@ function App() {
               <span className="mobile-text-base tablet-text-lg font-medium">Pedidos</span>
             </Button>
             <Button
+              variant={currentView === 'phone' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCurrentView('phone')}
+              className="flex-1 mobile-btn touch-target"
+            >
+              <Smartphone className="h-4 w-4 mr-2" />
+              <span className="mobile-text-base tablet-text-lg font-medium">Telefone</span>
+            </Button>
+            <Button
               variant={currentView === 'balcao' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setCurrentView('balcao')}
@@ -290,6 +300,12 @@ function App() {
       >
         {currentView === 'orders' ? (
           <OrderTaking 
+            onAddOrder={addOrder}
+            existingOrders={orders}
+            loading={loading}
+          />
+        ) : currentView === 'phone' ? (
+          <PhoneOrderTaking
             onAddOrder={addOrder}
             existingOrders={orders}
             loading={loading}
